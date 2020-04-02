@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (user != null) {
             finish();
-            startActivity(new Intent(MainActivity.this, SecondActivity.class));
+            startActivity(new Intent(MainActivity.this, DashboardActivity.class));
         }
 
         Register.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +102,9 @@ public class MainActivity extends AppCompatActivity {
         LoginPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, PhoneLoginActivity.class));
+                Intent intent = new Intent(MainActivity.this, PhoneLoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
     }
@@ -115,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBarLogin.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
-                    Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(MainActivity.this, SecondActivity.class));
+                    checkEmailVerification();
                 } else {
 //                    count --;
                     Toast.makeText(MainActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
@@ -126,5 +127,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void checkEmailVerification() {
+        FirebaseUser firebaseUser = fbauth.getInstance().getCurrentUser();
+        Boolean emailflag = firebaseUser.isEmailVerified();
+
+        if (emailflag) {
+            Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, DashboardActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            finish();
+            startActivity(intent);
+        } else {
+            Toast.makeText(MainActivity.this, "Verify Your Email", Toast.LENGTH_LONG).show();
+            fbauth.signOut();
+        }
     }
 }
