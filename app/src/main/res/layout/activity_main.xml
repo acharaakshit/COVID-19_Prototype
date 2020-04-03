@@ -12,19 +12,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter Password"
+        android:hint="@string/enter_password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etEmail"
-        app:layout_constraintVertical_bias="0.151" />
+        app:layout_constraintVertical_bias="0.151"
+        android:autofillHints="" />
 
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Log In"
+        android:text="@string/log_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -37,35 +38,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter Email"
+        android:hint="@string/enter_email"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.106" />
+        app:layout_constraintVertical_bias="0.106"
+        android:autofillHints="" />
 
     <TextView
         android:id="@+id/tvRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="120dp"
-        android:text="Not Registered? Sign Up"
+        android:text="@string/not_registered_sign_up"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pb_Login"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.825" />
 
     <Button
         android:id="@+id/btnLoginPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login In with phone"
+        android:layout_marginBottom="28dp"
+        android:text="@string/login_in_with_phone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
