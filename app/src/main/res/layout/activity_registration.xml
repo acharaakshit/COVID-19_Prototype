@@ -47,7 +47,7 @@
         android:layout_margin="0dp"
         android:autofillHints=""
         android:ems="10"
-        android:hint="@string/password"
+        android:hint="@string/set_password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
