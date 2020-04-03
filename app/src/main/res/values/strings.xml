@@ -20,4 +20,5 @@
     <string name="already_registered_login_in">Already Registered? Login In</string>
     <string name="password">Password</string>
     <string name="enter_phone_number">Enter Phone Number</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
