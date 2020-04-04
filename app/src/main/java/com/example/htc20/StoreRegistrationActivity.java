@@ -96,8 +96,7 @@ public class StoreRegistrationActivity extends AppCompatActivity {
                     user.put("email", email);
                     user.put("shop_name", shop_name);
                     user.put("service_category", category);
-
-
+                    
                     requestLocationPermission();
 
                     client.getLastLocation().addOnSuccessListener(StoreRegistrationActivity.this, new OnSuccessListener<Location>() {
@@ -111,7 +110,6 @@ public class StoreRegistrationActivity extends AppCompatActivity {
                                 Log.d("gp", "val: "+gp);
                                 user.put("shop_loc", gp);
                             }
-
                         }
                     });
 
