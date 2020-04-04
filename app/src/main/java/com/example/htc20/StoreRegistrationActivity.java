@@ -57,7 +57,7 @@ public class StoreRegistrationActivity extends AppCompatActivity {
         userPassword = (TextInputEditText) findViewById(R.id.etSetPassword);
         userEmail = (EditText) findViewById(R.id.etEmail);
         userLogin = (TextView) findViewById(R.id.etNotLogin);
-        register = (Button) findViewById(R.id.btnRegister);
+        register = (Button) findViewById(R.id.etRegister);
         uniqueID = (EditText) findViewById(R.id.etUniqueID);
         shopName = (EditText) findViewById(R.id.etShopName);
         service_category = (Spinner) findViewById(R.id.etCategories);
