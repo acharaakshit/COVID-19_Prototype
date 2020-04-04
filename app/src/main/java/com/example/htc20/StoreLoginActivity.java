@@ -37,7 +37,7 @@ public class StoreLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_store_login);
 
         password = (TextInputEditText) findViewById(R.id.etPassword);
-        uniqueID = (EditText) findViewById(R.id.etUniqueID);
+        uniqueID = (EditText) findViewById(R.id.editUniqueID);
         login = (Button) findViewById(R.id.etLogin);
         notRegister = (TextView) findViewById(R.id.etNotRegistered);
         progressBarLogin = findViewById(R.id.pb_Login);
@@ -62,12 +62,26 @@ public class StoreLoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBarLogin.setVisibility(View.VISIBLE);
                 String email = uniqueID.getText().toString().trim() + "@htc2020.com";
-                Validate(email, password.getText().toString().trim());
+                if(smallValidate(uniqueID.getText().toString().trim(), password.getText().toString().trim())) {
+                    Validate(email, password.getText().toString().trim());
+                    progressBarLogin.setVisibility(View.VISIBLE);
+                }
 
             }
         });
+    }
+
+    private boolean smallValidate(String userName, String password){
+        boolean result = false;
+        if(userName.isEmpty() || password.isEmpty()){
+            Toast.makeText(this, "Please Enter All Details", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            result = true;
+
+        }
+        return result;
     }
 
     private void Validate(String userName, String userPass) {
@@ -78,10 +92,15 @@ public class StoreLoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBarLogin.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
-                    checkEmailVerification();
+//                    checkEmailVerification();
+                    Toast.makeText(StoreLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(StoreLoginActivity.this, DashboardStoreActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    finish();
+                    startActivity(intent);
                 } else {
 //                    count --;
-                    Toast.makeText(StoreLoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(StoreLoginActivity.this, String.valueOf(task.getException()), Toast.LENGTH_SHORT).show();
 //                    if(count == 0) {
 //                        Login.setEnabled(false);
 //                    }
@@ -89,20 +108,20 @@ public class StoreLoginActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void checkEmailVerification() {
-        FirebaseUser firebaseUser = fbauth.getInstance().getCurrentUser();
-        Boolean emailflag = firebaseUser.isEmailVerified();
-
-        if (emailflag) {
-            Toast.makeText(StoreLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(StoreLoginActivity.this, DashboardStoreActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            finish();
-            startActivity(intent);
-        } else {
-            Toast.makeText(StoreLoginActivity.this, "Verify Your Email", Toast.LENGTH_LONG).show();
-            fbauth.signOut();
-        }
-    }
+//
+//    private void checkEmailVerification() {
+//        FirebaseUser firebaseUser = fbauth.getInstance().getCurrentUser();
+//        Boolean emailflag = firebaseUser.isEmailVerified();
+//
+//        if (emailflag) {
+//            Toast.makeText(StoreLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+//            Intent intent = new Intent(StoreLoginActivity.this, DashboardStoreActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            finish();
+//            startActivity(intent);
+//        } else {
+//            Toast.makeText(StoreLoginActivity.this, "Verify Your Email", Toast.LENGTH_LONG).show();
+//            fbauth.signOut();
+//        }
+//    }
 }
