@@ -3,7 +3,7 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    buildToolsVersion '29.0.3'
     defaultConfig {
         applicationId "com.example.htc20"
         minSdkVersion 19
@@ -20,11 +20,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = 1.7
+        targetCompatibility = 1.7
+    }
 }
 
 dependencies {
-    implementation "com.android.support:design:28.0.0"
-    implementation 'com.google.firebase:firebase-analytics:17.2.3'
+                                                                                                                                                                                                                            implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.android.support:multidex:1.0.3' // use latest version
     implementation 'com.google.firebase:firebase-auth:19.3.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -41,6 +44,8 @@ dependencies {
     implementation 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    // For developers using the Android Support Library
+    implementation 'pub.devrel:easypermissions:2.0.1'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
@@ -51,6 +56,7 @@ dependencies {
     //Libraries
     implementation 'com.karumi:dexter:4.2.0'
     implementation 'com.otaliastudios:cameraview:2.0.0-rc1'
+    implementation 'androidx.cardview:cardview:1.0.0'
 }
 
 configurations.all {
