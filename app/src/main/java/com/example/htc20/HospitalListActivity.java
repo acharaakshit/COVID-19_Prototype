@@ -36,7 +36,6 @@ public class HospitalListActivity extends AppCompatActivity {
     private FusedLocationProviderClient client;
     private int PROXIMITY_RADIUS = 1500;
     private ListView hospital_list;
-    String hospitals[] = {"Hospital1", "Hospital2", "Hospital3", "Hospital4", "Hospital5"};
     private Button mapsAcitivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +45,13 @@ public class HospitalListActivity extends AppCompatActivity {
 
         final ListView listview = (ListView) findViewById(R.id.lv_hospitalList);
 
-        mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
-        mapsAcitivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HospitalListActivity.this, MapsActivity.class));
-            }
-        });
+
         final ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < hospitals.length; ++i) {
-            list.add(hospitals[i]);
-        }
+
+
+        final ArrayAdapter adapter = new ArrayAdapter(this,
+                android.R.layout.simple_list_item_1, list);
+        listview.setAdapter(adapter);
 
 
         client = LocationServices.getFusedLocationProviderClient(this);
@@ -99,6 +94,7 @@ public class HospitalListActivity extends AppCompatActivity {
                                    Log.d("Longitudes","valueLong : "+HospitalLong);
                                    Log.d("Names","valueName : "+HospitalName);
                                     list.add(HospitalName);
+                                    adapter.notifyDataSetChanged();
                                    //parsing to be done
                                 } catch (JSONException e) {
                                     Log.d("Places", "Error in Adding places");
@@ -120,13 +116,13 @@ public class HospitalListActivity extends AppCompatActivity {
 
             }
         });
-
-        final ArrayAdapter adapter = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_1, list);
-        listview.setAdapter(adapter);
-
-
-
+        mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
+        mapsAcitivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HospitalListActivity.this, MapsActivity.class));
+            }
+        });
 
     }
 

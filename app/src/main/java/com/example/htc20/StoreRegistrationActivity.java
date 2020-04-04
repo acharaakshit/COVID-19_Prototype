@@ -1,19 +1,23 @@
 package com.example.htc20;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,13 +25,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class StoreRegistrationActivity extends AppCompatActivity {
     private EditText userEmail, uniqueID, shopName;
@@ -38,6 +44,8 @@ public class StoreRegistrationActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private MapsActivity map;
     private Spinner service_category;
+    private FusedLocationProviderClient client;
+    private final int REQUEST_LOCATION_PERMISSION = 1;
 
     private static final String TAG = "DocSnippets";
 
@@ -63,9 +71,28 @@ public class StoreRegistrationActivity extends AppCompatActivity {
         service_category = findViewById(R.id.etCategories);
         // map = (MapActivity)......................
 
+        //get location
+        requestLocationPermission();
+        client = LocationServices.getFusedLocationProviderClient(this);
+        client.getLastLocation().addOnSuccessListener(StoreRegistrationActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null){
+                    final double Latitude = location.getLatitude();
+                    final double Longitude = location.getLongitude();
+                    LatLng storeLatLng = new LatLng(Latitude, Longitude);
+
+
+                        }
+
+            }
+        });
+
+
         firebaseAuth = FirebaseAuth.getInstance();
 //        setup();
         db = FirebaseFirestore.getInstance();
+
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,21 +124,50 @@ public class StoreRegistrationActivity extends AppCompatActivity {
                                 }
                             });
 
-                    String temp_email = uniqueID + "@htc2020.com";
+                    String temp_email = strUniqueID + "@htc2020.com";
                     firebaseAuth.createUserWithEmailAndPassword(temp_email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                sendEmailVerification(email);
+//                                sendEmailVerification(email);
+                                Toast.makeText(StoreRegistrationActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(StoreRegistrationActivity.this, StoreLoginActivity.class));
 
                             } else {
-                                Toast.makeText(StoreRegistrationActivity.this, "Registration Failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(StoreRegistrationActivity.this, String.valueOf(task.getException()), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 }
             }
         });
+        userLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(StoreRegistrationActivity.this, StoreLoginActivity.class));
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("requestCode", "value : "+requestCode);
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @AfterPermissionGranted(REQUEST_LOCATION_PERMISSION)
+    public void requestLocationPermission() {
+        String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION};
+        if(EasyPermissions.hasPermissions(this, perms)) {
+            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
+
+        }
+        else {
+            EasyPermissions.requestPermissions(this, "Please grant the location permission", REQUEST_LOCATION_PERMISSION, perms);
+
+        }
     }
 
     private Boolean validate() {
@@ -131,26 +187,26 @@ public class StoreRegistrationActivity extends AppCompatActivity {
         return result;
     }
 
-    private void sendEmailVerification(String email) {
-        final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        final String temp_email = firebaseUser.getEmail();
-        firebaseUser.updateEmail(email);
-        if (firebaseUser != null) {
-            firebaseUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(StoreRegistrationActivity.this, "A Verification Link has been sent to you E-mail", Toast.LENGTH_LONG).show();
-                        firebaseAuth.signOut();
-                        finish();
-                        if (temp_email != null) {
-                            firebaseUser.updateEmail(temp_email);
-                        }
-                    } else {
-                        Toast.makeText(StoreRegistrationActivity.this, "Please Try Again Later or check if entered email is correct", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-    }
+//    private void sendEmailVerification(String email) {
+//        final FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+//        final String temp_email = firebaseUser.getEmail();
+//        firebaseUser.updateEmail(email);
+//        if (firebaseUser != null) {
+//            firebaseUser.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//                    if (task.isSuccessful()) {
+//                        Toast.makeText(StoreRegistrationActivity.this, "A Verification Link has been sent to you E-mail", Toast.LENGTH_LONG).show();
+//                        firebaseAuth.signOut();
+//                        finish();
+//                        if (temp_email != null) {
+//                            firebaseUser.updateEmail(temp_email);
+//                        }
+//                    } else {
+//                        Toast.makeText(StoreRegistrationActivity.this, "Please Try Again Later or check if entered email is correct", Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//            });
+//        }
+//    }
 }
