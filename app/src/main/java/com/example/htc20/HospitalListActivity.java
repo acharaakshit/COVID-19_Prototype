@@ -1,10 +1,13 @@
 package com.example.htc20;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +17,17 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class HospitalListActivity extends AppCompatActivity {
@@ -27,14 +35,29 @@ public class HospitalListActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient client;
     private int PROXIMITY_RADIUS = 1500;
-
+    private ListView hospital_list;
     String hospitals[] = {"Hospital1", "Hospital2", "Hospital3", "Hospital4", "Hospital5"};
-
+    private Button mapsAcitivity;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hospital_list);
-        ListView hospital_list = findViewById(R.id.lv_hospitalList);
+        hospital_list = findViewById(R.id.lv_hospitalList);
+
+        final ListView listview = (ListView) findViewById(R.id.lv_hospitalList);
+
+        mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
+        mapsAcitivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HospitalListActivity.this, MapsActivity.class));
+            }
+        });
+        final ArrayList<String> list = new ArrayList<String>();
+        for (int i = 0; i < hospitals.length; ++i) {
+            list.add(hospitals[i]);
+        }
+
 
         client = LocationServices.getFusedLocationProviderClient(this);
         client.getLastLocation().addOnSuccessListener(HospitalListActivity.this, new OnSuccessListener<Location>() {
@@ -54,6 +77,38 @@ public class HospitalListActivity extends AppCompatActivity {
                     try {
                         jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
                         Log.d("mytag", "values : "+ jsonOutput);
+                        JSONArray jsonArray = null;
+                        JSONObject jsonObject;
+                        String HospitalLat = "";
+                        String HospitalLong = "";
+                        String HospitalName  = "";
+                        try {
+                            Log.d("Places", "parse");
+                            jsonObject = new JSONObject((String) jsonOutput);
+                            Log.d("Places","Values : "+jsonObject);
+                            jsonArray = jsonObject.getJSONArray("results");
+                            int placesCount = jsonArray.length();
+                            Log.d("Loctag", "value: "+ placesCount);
+                            for (int i = 0; i < placesCount; i++) {
+                                try {
+                                   jsonObject = (JSONObject) jsonArray.get(i);
+                                   HospitalName  = jsonObject.getString("name");
+                                   HospitalLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
+                                   HospitalLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
+                                   Log.d("Latitudes", "valueLat :"+HospitalLat);
+                                   Log.d("Longitudes","valueLong : "+HospitalLong);
+                                   Log.d("Names","valueName : "+HospitalName);
+                                    list.add(HospitalName);
+                                   //parsing to be done
+                                } catch (JSONException e) {
+                                    Log.d("Places", "Error in Adding places");
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (JSONException e) {
+                            Log.d("Places", "parse error");
+                            e.printStackTrace();
+                        }
 
                     } catch (ExecutionException e) {
                         e.printStackTrace();
@@ -62,15 +117,17 @@ public class HospitalListActivity extends AppCompatActivity {
                     }
 
                 }
+
             }
         });
 
+        final ArrayAdapter adapter = new ArrayAdapter(this,
+                android.R.layout.simple_list_item_1, list);
+        listview.setAdapter(adapter);
 
 
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.activity_hospital_list, hospitals);
 
-        hospital_list.setAdapter(adapter);
+
     }
 
     private String getUrl(double latitude, double longitude, String nearbyPlace) {
