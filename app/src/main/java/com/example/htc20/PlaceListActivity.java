@@ -109,6 +109,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                count = 1;
                 PROXIMITY_RADIUS = progressValue[0] * 500;
                 setupList(listview);
             }
@@ -150,120 +151,100 @@ public class PlaceListActivity extends AppCompatActivity {
                     Longitude = location.getLongitude();
 
                     //the code to retrieve nearby places will be written below
-                    String data = "";
-                    InputStream iStream = null;
-                    HttpURLConnection urlConnection = null;
-                    String strUrl = null;
-                    try {
+
+
+                    String nearbyPlace = "";
+                    //String will contain the json output
+
+                    JSONArray jsonArray = null;
+                    JSONObject jsonObject;
+                    String PlaceLat = "";
+                    String PlaceLong = "";
+                    String PlaceName = "";
+                    int placesCount = 0;
+
+
                         switch (store_type) {
-                            case 1:
-                                strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy|drugstore");
-                                break;
-                            case 2:
-                                strUrl = getUrl(Latitude, Longitude, "grocery_or_supermarket");
-                                break;
-                            case 3:
-                                strUrl = getUrl(Latitude, Longitude, "bank|atm");
-                                break;
-                            case 4:
-                                strUrl = getUrl(Latitude, Longitude, "department_store");
-                                break;
-                            default:
-                                Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
+                            case 1:     nearbyPlace = "hospital|pharmacy|drugstore";    break;
+                            case 2:     nearbyPlace = "grocery_or_supermarket";     break;
+                            case 3:     nearbyPlace = "bank|atm";   break;
+                            case 4:     nearbyPlace = "department_store";   break;
+                            default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                         }
+
+                    try {
+                        jsonArray = getAllresults(Latitude, Longitude, nearbyPlace);
+                        placesCount = jsonArray.length();
+
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
-                    }
-                    //String will contain the json output
-                    String jsonOutput = null;
-
-                    db = FirebaseFirestore.getInstance();
-                    try {
-                        jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
-                        Log.d("mytag", "values : " + jsonOutput);
-                        JSONArray jsonArray = null;
-                        JSONObject jsonObject;
-                        String PlaceLat = "";
-                        String PlaceLong = "";
-                        String PlaceName = "";
-                        try {
-                            Log.d("Places", "parse");
-                            jsonObject = new JSONObject((String) jsonOutput);
-                            Log.d("Places", "Values : " + jsonObject);
-                            jsonArray = jsonObject.getJSONArray("results");
-                            int placesCount = jsonArray.length();
-                            Latitudes = new double[placesCount];
-                            Longitudes = new double[placesCount];
-                            Log.d("Loctag", "value: " + placesCount);
-                            for (int i = 0; i < placesCount; i++) {
-                                try {
-                                    jsonObject = (JSONObject) jsonArray.get(i);
-                                    PlaceName = jsonObject.getString("name");
-                                    PlaceLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
-                                    PlaceLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
-                                    Log.d("Latitudes", "valueLat :" + PlaceLat);
-                                    Log.d("Longitudes", "valueLong : " + PlaceLong);
-                                    Latitudes[i] = Double.parseDouble(PlaceLat);
-                                    Longitudes[i] = Double.parseDouble(PlaceLong);
-                                    CollectionReference ref = db.collection("store");
-                                    Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
-                                    final Map<String, Integer> user = new HashMap<>();
-                                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            int lcc;
-                                            if (task.isSuccessful()) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    lcc = Integer.parseInt((String) document.getData().get("lcc"));
-                                                    user.put("lcc", lcc);
-                                                }
-                                            }
-                                        }
-                                    });
-                                    Integer lcc = user.get("lcc");
-                                    list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
-                                    count++;
-                                    adapter.notifyDataSetChanged();
-                                    //parsing to be done
-                                } catch (JSONException e) {
-                                    Log.d("Places", "Error in Adding places");
-                                    e.printStackTrace();
-                                }
-                            }
-                        } catch (JSONException e) {
-                            Log.d("Places", "parse error");
-                            e.printStackTrace();
-                        }
-
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
+
+                    db = FirebaseFirestore.getInstance();
+
+                    Latitudes = new double[placesCount];
+                    Longitudes = new double[placesCount];
+
+                    Log.d("Loctag", "value: " + placesCount);
+
+                    for (int i = 0; i < placesCount; i++) {
+                        try {
+
+                            jsonObject = (JSONObject) jsonArray.get(i);
+                            PlaceName = jsonObject.getString("name");
+                            PlaceLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
+                            PlaceLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
+                            Log.d("Latitudes", "valueLat :" + PlaceLat);
+                            Log.d("Longitudes", "valueLong : " + PlaceLong);
+                            Latitudes[i] = Double.parseDouble(PlaceLat);
+                            Longitudes[i] = Double.parseDouble(PlaceLong);
+                            CollectionReference ref = db.collection("store");
+                            Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
+                            final Map<String, Integer> user = new HashMap<>();
+                            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    int lcc;
+                                    if (task.isSuccessful()) {
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            lcc = Integer.parseInt((String) document.getData().get("lcc"));
+                                            user.put("lcc", lcc);
+                                        }
+                                    }
+                                }
+                            });
+                            Integer lcc = user.get("lcc");
+                            list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
+                            count++;
+                            adapter.notifyDataSetChanged();
+                            //parsing to be done
+                        } catch (JSONException e) {
+                            Log.d("Places", "Error in Adding places");
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
             }
         });
+
         mapsAcitivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude);
                 switch (store_type) {
-                    case 1:
-                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital|pharmacy|drugstore");
-                        break;
-                    case 2:
-                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket");
-                        ;
-                        break;
-                    case 3:
-                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=bank|atm");
-                        break;
-                    case 4:
-                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=department_store");
-                    default:
-                        Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
+                    case 1:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital|pharmacy|drugstore"); break;
+                    case 2:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket");  break;
+                    case 3:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=bank|atm");  break;
+                    case 4:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=department_store");
+                    default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                 }
 
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -275,18 +256,81 @@ public class PlaceListActivity extends AppCompatActivity {
         });
     }
 
-    private String getUrl(double latitude, double longitude, String nearbyPlace) throws UnsupportedEncodingException {
+    private JSONArray getAllresults(double Latitude,double  Longitude, String nearbyPlace) throws UnsupportedEncodingException, ExecutionException, InterruptedException, JSONException {
+
+        String strUrl = null;
+        String next_page_token = "";
+        String jsonOutput = null;
+        JSONObject jsonObject = null;
+
+        strUrl = getUrl(Latitude, Longitude, nearbyPlace, next_page_token);
+        jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
+        jsonObject = new JSONObject((String) jsonOutput);
+        Log.d("mytag","value:"+jsonObject);
+        JSONArray jsonArray1 = jsonObject.getJSONArray("results");
+        Log.d("mytag","value: "+jsonArray1.length());
+
+        //next_page_token = jsonObject.getString("next_page_token");
+
+        /*if(next_page_token != "") {
+            strUrl = getUrl(Latitude, Longitude, nearbyPlace, next_page_token);
+            jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
+            Log.d("mytag","val:"+jsonOutput);
+            jsonObject = new JSONObject((String) jsonOutput);
+            JSONArray jsonArray2 = jsonObject.getJSONArray("results");
+            Log.d("mytag","value: "+jsonArray2.length());
+
+            next_page_token = "";
+            next_page_token = jsonObject.getString("next_page_token");
+
+            if (next_page_token == "") {
+                strUrl = getUrl(Latitude, Longitude, nearbyPlace, next_page_token);
+                jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
+                jsonObject = new JSONObject((String) jsonOutput);
+                JSONArray jsonArray3 = jsonObject.getJSONArray("results");
+                Log.d("mytag","value: "+jsonArray2.length());
+                if (jsonArray2.length()>0 && jsonArray3.length()>0){
+                    // return concatArray(jsonArray1, jsonArray2, jsonArray3);
+                }
+            }
+*/
+       /*     if(jsonArray2.length()>0);
+                // return concatArray(jsonArray1, jsonArray2);
+        }*/
+
+        return  concatArray(jsonArray1);
+    }
+
+
+    private String getUrl(double latitude, double longitude, String nearbyPlace, String next_page_token) throws UnsupportedEncodingException {
 
         StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlacesUrl.append("location=" + latitude + "," + longitude);
         googlePlacesUrl.append("&radius="+PROXIMITY_RADIUS);
         googlePlacesUrl.append("&types=" + URLEncoder.encode(nearbyPlace,"UTF-8"));
-        //googlePlacesUrl.append("&sensor=true");
+        googlePlacesUrl.append("&sensor=false");
+        googlePlacesUrl.append("hasNextPage=true&nextPage()=true");
         googlePlacesUrl.append("&key=" + "AIzaSyBpsUyOqhq0MOBN0abTsFFlrAa4WUqkzQQ");
+        if (next_page_token == "");
+        else
+            googlePlacesUrl.append("&pagetoken="+next_page_token);
+
         Log.d("getUrl", googlePlacesUrl.toString());
         return (googlePlacesUrl.toString());
     }
 
+    private JSONArray concatArray(JSONArray... arrs)
+            throws JSONException {
+        JSONArray result = new JSONArray();
+        for (JSONArray arr : arrs) {
+            for (int i = 0; i < arr.length(); i++) {
+                result.put(arr.get(i));
+            }
+        }
+        Log.d("mytag","valres:"+result);
+        return result;
+
+    }
 
 }
 
