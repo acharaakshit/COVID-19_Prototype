@@ -84,8 +84,10 @@ public class PlaceListActivity extends AppCompatActivity {
         tv_distance = findViewById(R.id.tv_distance);
 
         sb_distance.setMin(3);
+
         tv_distance.setText("Proximity Radius: " + sb_distance.getMin() * 0.5 + " km.");
 
+        setupList(listview);
         setupSeekBar(listview, sb_distance, tv_distance);
 
     }
