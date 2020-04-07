@@ -21,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -158,7 +157,7 @@ public class PlaceListActivity extends AppCompatActivity {
                     try {
                         switch (store_type) {
                             case 1:
-                                strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy");
+                                strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy|drugstore");
                                 break;
                             case 2:
                                 strUrl = getUrl(Latitude, Longitude, "grocery_or_supermarket");
@@ -252,7 +251,7 @@ public class PlaceListActivity extends AppCompatActivity {
                 Uri gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude);
                 switch (store_type) {
                     case 1:
-                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital|pharmacy");
+                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital|pharmacy|drugstore");
                         break;
                     case 2:
                         gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket");
