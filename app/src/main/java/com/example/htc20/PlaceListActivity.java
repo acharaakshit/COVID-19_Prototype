@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,8 +12,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -63,15 +67,54 @@ public class PlaceListActivity extends AppCompatActivity {
     //serial number of the essential places to be displayed
     int count = 1;
 
+    private SeekBar sb_distance;
+    private TextView tv_distance;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_list);
+
+        //Initialization of Elements in layout file
         places_list = findViewById(R.id.lv_places_list);
-
         final ListView listview = (ListView) findViewById(R.id.lv_places_list);
+        mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
+        sb_distance = findViewById(R.id.sb_distance);
+        tv_distance = findViewById(R.id.tv_distance);
 
+        sb_distance.setMin(3);
+        tv_distance.setText("Proximity Radius: " + sb_distance.getMin() * 0.5 + " km.");
 
+        setupSeekBar(listview, sb_distance, tv_distance);
+
+    }
+
+    private void setupSeekBar(final ListView listview, SeekBar sb_distance, final TextView tv_distance) {
+        final int[] progressValue = new int[1];
+        sb_distance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progressValue[0] = progress;
+                double d = progressValue[0] * 0.5;
+                tv_distance.setText("Proximity Radius: " + d + " km.");
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                PROXIMITY_RADIUS = progressValue[0] * 500;
+                setupList(listview);
+            }
+        });
+    }
+
+    private void setupList(final ListView listview) {
         final ArrayList<String> list = new ArrayList<String>();
 
 
@@ -100,11 +143,11 @@ public class PlaceListActivity extends AppCompatActivity {
         client.getLastLocation().addOnSuccessListener(PlaceListActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                if (location != null){
+                if (location != null) {
                     FirebaseFirestore db;
                     Latitude = location.getLatitude();
                     Longitude = location.getLongitude();
-                    LatLng myLatLng = new LatLng(Latitude, Longitude);
+
                     //the code to retrieve nearby places will be written below
                     String data = "";
                     InputStream iStream = null;
@@ -112,11 +155,20 @@ public class PlaceListActivity extends AppCompatActivity {
                     String strUrl = null;
                     try {
                         switch (store_type) {
-                            case 1:   strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy"); break;
-                            case 2:   strUrl = getUrl(Latitude, Longitude, "grocery_or_supermarket"); break;
-                            case 3:   strUrl = getUrl(Latitude, Longitude, "bank|atm"); break;
-                            case 4:   strUrl = getUrl(Latitude, Longitude, "department_store"); break;
-                            default: Log.d("errtag","Unexpected entry! check DashboardCitizenActivity");
+                            case 1:
+                                strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy");
+                                break;
+                            case 2:
+                                strUrl = getUrl(Latitude, Longitude, "grocery_or_supermarket");
+                                break;
+                            case 3:
+                                strUrl = getUrl(Latitude, Longitude, "bank|atm");
+                                break;
+                            case 4:
+                                strUrl = getUrl(Latitude, Longitude, "department_store");
+                                break;
+                            default:
+                                Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -127,29 +179,29 @@ public class PlaceListActivity extends AppCompatActivity {
                     db = FirebaseFirestore.getInstance();
                     try {
                         jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
-                        Log.d("mytag", "values : "+ jsonOutput);
+                        Log.d("mytag", "values : " + jsonOutput);
                         JSONArray jsonArray = null;
                         JSONObject jsonObject;
                         String PlaceLat = "";
                         String PlaceLong = "";
-                        String PlaceName  = "";
+                        String PlaceName = "";
                         try {
                             Log.d("Places", "parse");
                             jsonObject = new JSONObject((String) jsonOutput);
-                            Log.d("Places","Values : "+jsonObject);
+                            Log.d("Places", "Values : " + jsonObject);
                             jsonArray = jsonObject.getJSONArray("results");
                             int placesCount = jsonArray.length();
                             Latitudes = new double[placesCount];
                             Longitudes = new double[placesCount];
-                            Log.d("Loctag", "value: "+ placesCount);
+                            Log.d("Loctag", "value: " + placesCount);
                             for (int i = 0; i < placesCount; i++) {
-                                try{
+                                try {
                                     jsonObject = (JSONObject) jsonArray.get(i);
-                                    PlaceName  = jsonObject.getString("name");
+                                    PlaceName = jsonObject.getString("name");
                                     PlaceLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
                                     PlaceLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
-                                    Log.d("Latitudes", "valueLat :"+PlaceLat);
-                                    Log.d("Longitudes","valueLong : "+PlaceLong);
+                                    Log.d("Latitudes", "valueLat :" + PlaceLat);
+                                    Log.d("Longitudes", "valueLong : " + PlaceLong);
                                     Latitudes[i] = Double.parseDouble(PlaceLat);
                                     Longitudes[i] = Double.parseDouble(PlaceLong);
                                     CollectionReference ref = db.collection("store");
@@ -192,17 +244,25 @@ public class PlaceListActivity extends AppCompatActivity {
 
             }
         });
-        mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
         mapsAcitivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude);
+                Uri gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude);
                 switch (store_type) {
-                    case 1:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=hospital|pharmacy"); break;
-                    case 2:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=grocery_or_supermarket");; break;
-                    case 3:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=bank|atm"); break;
-                    case 4:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=department_store");
-                    default: Log.d("errtag","Unexpected entry! check DashboardCitizenActivity");
+                    case 1:
+                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital|pharmacy");
+                        break;
+                    case 2:
+                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket");
+                        ;
+                        break;
+                    case 3:
+                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=bank|atm");
+                        break;
+                    case 4:
+                        gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=department_store");
+                    default:
+                        Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                 }
 
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -212,7 +272,6 @@ public class PlaceListActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private String getUrl(double latitude, double longitude, String nearbyPlace) throws UnsupportedEncodingException {

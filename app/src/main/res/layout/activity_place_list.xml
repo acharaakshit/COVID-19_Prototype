@@ -23,6 +23,28 @@
         android:text="View On Maps"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lv_places_list" />
+        app:layout_constraintTop_toBottomOf="@+id/lv_places_list"
+        app:layout_constraintVertical_bias="0.216" />
+
+    <SeekBar
+        android:id="@+id/sb_distance"
+        android:layout_width="300sp"
+        android:layout_height="34dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_mapsActivityLauncher"
+        app:layout_constraintVertical_bias="0.269" />
+
+    <TextView
+        android:id="@+id/tv_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Proximity Radius: "
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sb_distance" />
 </androidx.constraintlayout.widget.ConstraintLayout>
