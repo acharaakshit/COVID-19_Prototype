@@ -111,6 +111,7 @@ public class PlaceListActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 PROXIMITY_RADIUS = progressValue[0] * 500;
+                count = 1;
                 setupList(listview);
             }
         });
