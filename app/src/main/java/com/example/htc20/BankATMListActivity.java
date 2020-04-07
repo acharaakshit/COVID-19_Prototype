@@ -44,32 +44,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class HospitalListActivity extends AppCompatActivity {
+public class BankATMListActivity extends AppCompatActivity {
 
     //variables
     private FusedLocationProviderClient client;
     //radius for searching the nearby places
     private int PROXIMITY_RADIUS = 1500;
-    // list of hospitals to be displayed
-    private ListView hospital_list;
-    // button to view all the nearby hospitals
+    // list of departmental stores to be displayed
+    private ListView bankatm_list;
+    // button to view all the nearby banks/atms
     private Button mapsAcitivity;
-    // Latitudes and Longitudes of all the nearby hospitals
+    // Latitudes and Longitudes of all the nearby banks/atms
     double[] Latitudes;
     double[] Longitudes;
     //global variables as location will be used outside the local blocks
     double Latitude = 0;
     double Longitude = 0;
-    //serial number of the hospitals to be displayed
+    //serial number of the banks/atms to be displayed
     int count = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hospital_list);
-        hospital_list = findViewById(R.id.lv_hospitalList);
+        setContentView(R.layout.activity_bank_a_t_m_list);
+        bankatm_list = findViewById(R.id.lv_bankatmlist);
 
-        final ListView listview = (ListView) findViewById(R.id.lv_hospitalList);
+        final ListView listview = (ListView) findViewById(R.id.lv_bankatmlist);
 
 
         final ArrayList<String> list = new ArrayList<String>();
@@ -94,7 +94,7 @@ public class HospitalListActivity extends AppCompatActivity {
         });
         //
         client = LocationServices.getFusedLocationProviderClient(this);
-        client.getLastLocation().addOnSuccessListener(HospitalListActivity.this, new OnSuccessListener<Location>() {
+        client.getLastLocation().addOnSuccessListener(BankATMListActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null){
@@ -107,8 +107,9 @@ public class HospitalListActivity extends AppCompatActivity {
                     InputStream iStream = null;
                     HttpURLConnection urlConnection = null;
                     String strUrl = null;
+
                     try {
-                        strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy");
+                        strUrl = getUrl(Latitude, Longitude, "bank|atm");
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -117,13 +118,13 @@ public class HospitalListActivity extends AppCompatActivity {
 
                     db = FirebaseFirestore.getInstance();
                     try {
-                        jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
+                        jsonOutput = new RequestJsonBanks().execute(strUrl).get();
                         Log.d("mytag", "values : "+ jsonOutput);
                         JSONArray jsonArray = null;
                         JSONObject jsonObject;
-                        String HospitalLat = "";
-                        String HospitalLong = "";
-                        String HospitalName  = "";
+                        String BankLat = "";
+                        String BankLong = "";
+                        String BankName  = "";
                         try {
                             Log.d("Places", "parse");
                             jsonObject = new JSONObject((String) jsonOutput);
@@ -136,13 +137,13 @@ public class HospitalListActivity extends AppCompatActivity {
                             for (int i = 0; i < placesCount; i++) {
                                 try{
                                     jsonObject = (JSONObject) jsonArray.get(i);
-                                    HospitalName  = jsonObject.getString("name");
-                                    HospitalLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
-                                    HospitalLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
-                                    Log.d("Latitudes", "valueLat :"+HospitalLat);
-                                    Log.d("Longitudes","valueLong : "+HospitalLong);
-                                    Latitudes[i] = Double.parseDouble(HospitalLat);
-                                    Longitudes[i] = Double.parseDouble(HospitalLong);
+                                    BankName  = jsonObject.getString("name");
+                                    BankLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
+                                    BankLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
+                                    Log.d("Latitudes", "valueLat :"+BankLat);
+                                    Log.d("Longitudes","valueLong : "+BankLong);
+                                    Latitudes[i] = Double.parseDouble(BankLat);
+                                    Longitudes[i] = Double.parseDouble(BankLong);
                                     CollectionReference ref = db.collection("store");
                                     Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
                                     final Map<String, Integer> user = new HashMap<>();
@@ -159,7 +160,7 @@ public class HospitalListActivity extends AppCompatActivity {
                                         }
                                     });
                                     Integer lcc = user.get("lcc");
-                                    list.add(count + ". " + HospitalName + "\t\t: " + String.valueOf(lcc));
+                                    list.add(count + ". " + BankName + "\t\t: " + String.valueOf(lcc));
                                     count++;
                                     adapter.notifyDataSetChanged();
                                     //parsing to be done
@@ -193,7 +194,7 @@ public class HospitalListActivity extends AppCompatActivity {
                 //Go_to_map.putExtra("Latitudes", Latitudes);
                 //Go_to_map.putExtra("Longitudes", Longitudes);
                 //startActivity(Go_to_map);
-                Uri gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=hospital|pharmacy");
+                Uri gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=bank|atm");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 if (mapIntent.resolveActivity(getPackageManager()) != null) {
@@ -219,7 +220,7 @@ public class HospitalListActivity extends AppCompatActivity {
 
 }
 
-class RequestJsonPlaces extends AsyncTask<String, String, String> {
+class RequestJsonBanks extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... params) {
