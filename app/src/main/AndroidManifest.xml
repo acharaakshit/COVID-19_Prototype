@@ -28,9 +28,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".GroceryListActivity"></activity>
-        <activity android:name=".BankATMListActivity" />
-        <activity android:name=".DepStoreListActivity" />
         <activity android:name=".DashboardCitizenActivity" />
         <activity android:name=".StoreRegistrationActivity">
 
@@ -41,7 +38,7 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".HospitalListActivity" />
+        <activity android:name=".PlaceListActivity" />
         <activity android:name=".StoreLoginActivity" />
         <activity android:name=".DashboardStoreActivity" />
         <activity android:name=".LauncherActivity">

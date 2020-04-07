@@ -44,32 +44,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class BankATMListActivity extends AppCompatActivity {
+public class PlaceListActivity extends AppCompatActivity {
 
     //variables
     private FusedLocationProviderClient client;
-    //radius for searching the nearby places
+    //radius for searching the nearby essential places
     private int PROXIMITY_RADIUS = 1500;
-    // list of departmental stores to be displayed
-    private ListView bankatm_list;
-    // button to view all the nearby banks/atms
+    // list of hospitals to be displayed
+    private ListView places_list;
+    // button to view all the nearby essential places
     private Button mapsAcitivity;
-    // Latitudes and Longitudes of all the nearby banks/atms
+    // Latitudes and Longitudes of all the essential places
     double[] Latitudes;
     double[] Longitudes;
     //global variables as location will be used outside the local blocks
     double Latitude = 0;
     double Longitude = 0;
-    //serial number of the banks/atms to be displayed
+    //serial number of the essential places to be displayed
     int count = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bank_a_t_m_list);
-        bankatm_list = findViewById(R.id.lv_bankatmlist);
+        setContentView(R.layout.activity_place_list);
+        places_list = findViewById(R.id.lv_places_list);
 
-        final ListView listview = (ListView) findViewById(R.id.lv_bankatmlist);
+        final ListView listview = (ListView) findViewById(R.id.lv_places_list);
 
 
         final ArrayList<String> list = new ArrayList<String>();
@@ -92,9 +92,12 @@ public class BankATMListActivity extends AppCompatActivity {
 
             }
         });
+        //specify the type of store
+        Bundle extras = getIntent().getExtras();
+        final int store_type = extras.getInt("number");
         //
         client = LocationServices.getFusedLocationProviderClient(this);
-        client.getLastLocation().addOnSuccessListener(BankATMListActivity.this, new OnSuccessListener<Location>() {
+        client.getLastLocation().addOnSuccessListener(PlaceListActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null){
@@ -107,9 +110,14 @@ public class BankATMListActivity extends AppCompatActivity {
                     InputStream iStream = null;
                     HttpURLConnection urlConnection = null;
                     String strUrl = null;
-
                     try {
-                        strUrl = getUrl(Latitude, Longitude, "bank|atm");
+                        switch (store_type) {
+                            case 1:   strUrl = getUrl(Latitude, Longitude, "hospital|pharmacy"); break;
+                            case 2:   strUrl = getUrl(Latitude, Longitude, "grocery_or_supermarket"); break;
+                            case 3:   strUrl = getUrl(Latitude, Longitude, "bank|atm"); break;
+                            case 4:   strUrl = getUrl(Latitude, Longitude, "department_store"); break;
+                            default: Log.d("errtag","Unexpected entry! check DashboardCitizenActivity");
+                        }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -118,13 +126,13 @@ public class BankATMListActivity extends AppCompatActivity {
 
                     db = FirebaseFirestore.getInstance();
                     try {
-                        jsonOutput = new RequestJsonBanks().execute(strUrl).get();
+                        jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
                         Log.d("mytag", "values : "+ jsonOutput);
                         JSONArray jsonArray = null;
                         JSONObject jsonObject;
-                        String BankLat = "";
-                        String BankLong = "";
-                        String BankName  = "";
+                        String PlaceLat = "";
+                        String PlaceLong = "";
+                        String PlaceName  = "";
                         try {
                             Log.d("Places", "parse");
                             jsonObject = new JSONObject((String) jsonOutput);
@@ -137,13 +145,13 @@ public class BankATMListActivity extends AppCompatActivity {
                             for (int i = 0; i < placesCount; i++) {
                                 try{
                                     jsonObject = (JSONObject) jsonArray.get(i);
-                                    BankName  = jsonObject.getString("name");
-                                    BankLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
-                                    BankLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
-                                    Log.d("Latitudes", "valueLat :"+BankLat);
-                                    Log.d("Longitudes","valueLong : "+BankLong);
-                                    Latitudes[i] = Double.parseDouble(BankLat);
-                                    Longitudes[i] = Double.parseDouble(BankLong);
+                                    PlaceName  = jsonObject.getString("name");
+                                    PlaceLat = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat");
+                                    PlaceLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
+                                    Log.d("Latitudes", "valueLat :"+PlaceLat);
+                                    Log.d("Longitudes","valueLong : "+PlaceLong);
+                                    Latitudes[i] = Double.parseDouble(PlaceLat);
+                                    Longitudes[i] = Double.parseDouble(PlaceLong);
                                     CollectionReference ref = db.collection("store");
                                     Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
                                     final Map<String, Integer> user = new HashMap<>();
@@ -160,7 +168,7 @@ public class BankATMListActivity extends AppCompatActivity {
                                         }
                                     });
                                     Integer lcc = user.get("lcc");
-                                    list.add(count + ". " + BankName + "\t\t: " + String.valueOf(lcc));
+                                    list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
                                     count++;
                                     adapter.notifyDataSetChanged();
                                     //parsing to be done
@@ -188,13 +196,15 @@ public class BankATMListActivity extends AppCompatActivity {
         mapsAcitivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Uri gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude);
+                switch (store_type) {
+                    case 1:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=hospital|pharmacy"); break;
+                    case 2:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=grocery_or_supermarket");; break;
+                    case 3:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=bank|atm"); break;
+                    case 4:   gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=department_store");
+                    default: Log.d("errtag","Unexpected entry! check DashboardCitizenActivity");
+                }
 
-
-                //Intent Go_to_map = new Intent(HospitalListActivity.this, MapsActivity.class);
-                //Go_to_map.putExtra("Latitudes", Latitudes);
-                //Go_to_map.putExtra("Longitudes", Longitudes);
-                //startActivity(Go_to_map);
-                Uri gmmIntentUri = Uri.parse("geo:"+Latitude+","+Longitude+"?q=bank|atm");
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 if (mapIntent.resolveActivity(getPackageManager()) != null) {
@@ -220,7 +230,7 @@ public class BankATMListActivity extends AppCompatActivity {
 
 }
 
-class RequestJsonBanks extends AsyncTask<String, String, String> {
+class RequestJsonPlaces extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... params) {

@@ -36,7 +36,9 @@ public class DashboardCitizenActivity extends AppCompatActivity {
         getHospitals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardCitizenActivity.this, HospitalListActivity.class));
+                Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
+                i.putExtra("number", 1);
+                startActivity(i);
             }
         });
         // view nearby department stores
@@ -44,7 +46,9 @@ public class DashboardCitizenActivity extends AppCompatActivity {
         getStores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardCitizenActivity.this, DepStoreListActivity.class));
+                Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
+                i.putExtra("number", 2);
+                startActivity(i);
             }
         });
         //view nearby banks and atms
@@ -52,7 +56,9 @@ public class DashboardCitizenActivity extends AppCompatActivity {
         getBanksATMs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardCitizenActivity.this, BankATMListActivity.class));
+                Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
+                i.putExtra("number", 3);
+                startActivity(i);
             }
         });
         // view nearby groceries and supermarkets
@@ -60,7 +66,9 @@ public class DashboardCitizenActivity extends AppCompatActivity {
         getGroceries.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DashboardCitizenActivity.this, GroceryListActivity.class));
+                Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
+                i.putExtra("number", 4);
+                startActivity(i);
             }
         });
 
