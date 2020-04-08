@@ -1,5 +1,7 @@
 package com.example.htc20;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -129,15 +132,37 @@ public class PlaceListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String n = listview.getItemAtPosition(position).toString();
-                int index = n.charAt(0) - '1';
-                Intent i = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
-                i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                startActivity(i);
+                final int index = n.charAt(0) - '1';
+                //add pop up with two buttons
+                Dialog dialog = new Dialog(PlaceListActivity.this);
+                dialog.setContentView(R.layout.custom_dialog_layout);
+                Button order = (Button)dialog.getWindow().findViewById(R.id.btn_order);
+                Button directions = (Button)dialog.getWindow().findViewById(R.id.btn_directions);
+                order.setOnClickListener(new View.OnClickListener() {
+                    @SuppressLint("WrongConstant")
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(),"Enter your order", 200).show();
+
+                    }
+                });
+                directions.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Intent i = new Intent(android.content.Intent.ACTION_VIEW,
+                                Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
+                        i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                        startActivity(i);
+                    }
+                });
+                dialog.show();
+
 
             }
         });
-        //specify the type of store
+
+        //specify the type of service
         Bundle extras = getIntent().getExtras();
         final int store_type = extras.getInt("number");
         //
@@ -165,9 +190,9 @@ public class PlaceListActivity extends AppCompatActivity {
 
 
                         switch (store_type) {
-                            case 1:     nearbyPlace = "hospital|pharmacy|drugstore";    break;
+                            case 1:     nearbyPlace = "pharmacy|drugstore";    break;
                             case 2:     nearbyPlace = "grocery_or_supermarket";     break;
-                            case 3:     nearbyPlace = "bank|atm";   break;
+                            case 3:     nearbyPlace = "atm";   break;
                             case 4:     nearbyPlace = "department_store";   break;
                             default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                         }
@@ -240,9 +265,9 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Uri gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude);
                 switch (store_type) {
-                    case 1:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital|pharmacy|drugstore"); break;
+                    case 1:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=pharmacy|drugstore"); break;
                     case 2:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket");  break;
-                    case 3:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=bank|atm");  break;
+                    case 3:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=atm");  break;
                     case 4:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=department_store");
                     default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                 }
