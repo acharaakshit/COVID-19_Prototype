@@ -1,7 +1,9 @@
 package com.example.htc20;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -134,6 +138,7 @@ public class PlaceListActivity extends AppCompatActivity {
                 String n = listview.getItemAtPosition(position).toString();
                 final int index = n.charAt(0) - '1';
                 //add pop up with two buttons
+
                 Dialog dialog = new Dialog(PlaceListActivity.this);
                 dialog.setContentView(R.layout.custom_dialog_layout);
                 Button order = (Button)dialog.getWindow().findViewById(R.id.btn_order);
@@ -142,8 +147,8 @@ public class PlaceListActivity extends AppCompatActivity {
                     @SuppressLint("WrongConstant")
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getApplicationContext(),"Enter your order", 200).show();
-
+                       //give order
+                        popUpEditText();
                     }
                 });
                 directions.setOnClickListener(new View.OnClickListener() {
@@ -295,35 +300,7 @@ public class PlaceListActivity extends AppCompatActivity {
         JSONArray jsonArray1 = jsonObject.getJSONArray("results");
         Log.d("mytag","value: "+jsonArray1.length());
 
-        //next_page_token = jsonObject.getString("next_page_token");
-
-        /*if(next_page_token != "") {
-            strUrl = getUrl(Latitude, Longitude, nearbyPlace, next_page_token);
-            jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
-            Log.d("mytag","val:"+jsonOutput);
-            jsonObject = new JSONObject((String) jsonOutput);
-            JSONArray jsonArray2 = jsonObject.getJSONArray("results");
-            Log.d("mytag","value: "+jsonArray2.length());
-
-            next_page_token = "";
-            next_page_token = jsonObject.getString("next_page_token");
-
-            if (next_page_token == "") {
-                strUrl = getUrl(Latitude, Longitude, nearbyPlace, next_page_token);
-                jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
-                jsonObject = new JSONObject((String) jsonOutput);
-                JSONArray jsonArray3 = jsonObject.getJSONArray("results");
-                Log.d("mytag","value: "+jsonArray2.length());
-                if (jsonArray2.length()>0 && jsonArray3.length()>0){
-                    // return concatArray(jsonArray1, jsonArray2, jsonArray3);
-                }
-            }
-*/
-       /*     if(jsonArray2.length()>0);
-                // return concatArray(jsonArray1, jsonArray2);
-        }*/
-
-        return  concatArray(jsonArray1);
+        return  jsonArray1;
     }
 
 
@@ -344,16 +321,37 @@ public class PlaceListActivity extends AppCompatActivity {
         return (googlePlacesUrl.toString());
     }
 
-    private JSONArray concatArray(JSONArray... arrs)
-            throws JSONException {
-        JSONArray result = new JSONArray();
-        for (JSONArray arr : arrs) {
-            for (int i = 0; i < arr.length(); i++) {
-                result.put(arr.get(i));
+    private void popUpEditText() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Please enter your order:");
+
+        final EditText input = new EditText(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @SuppressLint("WrongConstant")
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // do something
+                Toast.makeText(getApplicationContext(),"Order Submitted", 200).show();
+                String cust_order = input.getText().toString();
+                Log.d("order","val: "+cust_order);
+
             }
-        }
-        Log.d("mytag","valres:"+result);
-        return result;
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
 
     }
 
