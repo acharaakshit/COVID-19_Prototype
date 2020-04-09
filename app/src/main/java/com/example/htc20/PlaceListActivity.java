@@ -144,7 +144,7 @@ public class PlaceListActivity extends AppCompatActivity {
                 //add pop up with two buttons
                 if(store_type == 1 || store_type == 2 || store_type == 4) {
 
-                    Dialog dialog = new Dialog(PlaceListActivity.this);
+                    final Dialog dialog = new Dialog(PlaceListActivity.this);
                     dialog.setContentView(R.layout.custom_dialog_layout);
 
                     Button one = (Button) dialog.getWindow().findViewById(R.id.btn_1);
@@ -161,6 +161,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 popUpEditText();
+                                dialog.cancel();
                             }
                         });
                         two.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +172,7 @@ public class PlaceListActivity extends AppCompatActivity {
                                         Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
                                 i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                                 startActivity(i);
+                                dialog.cancel();
                             }
                         });
                     }else if (store_type == 4){
