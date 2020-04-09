@@ -345,12 +345,17 @@ public class PlaceListActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-
+                    //append the registered stores in the proximity radius to the list
                     CollectionReference addref = db.collection("store");
                     Log.d("t","value:"+addref.get());
+                    //get the minimum and maximum latitudes and longitudes
                     LatLng[] latLng1 = boundingCoordinates(PROXIMITY_RADIUS);
                     Log.d("mmtag","val:"+latLng1[0]);
 
+                    Query addquery =  addref.whereGreaterThanOrEqualTo("latitude",latLng1[0].latitude);
+                    addquery =   addref.whereGreaterThanOrEqualTo("longitude",latLng1[0].longitude);
+                    addquery =   addref.whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
+                    addquery =   addref.whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
                 }
 
             }
@@ -445,18 +450,19 @@ public class PlaceListActivity extends AppCompatActivity {
 
     }
 
-    public LatLng[] boundingCoordinates(double radius) {
-        double radLat = Latitude;
-        double radLon = Longitude;
-        double distance = 6371/1000;
+    public LatLng[] boundingCoordinates(double distance) {
+        double radLat = Math.toRadians(Latitude);
+        double radLon = Math.toRadians(Longitude);
+        double radius = 6371*1000.0;
         if (radius < 0d || distance < 0d)
             throw new IllegalArgumentException();
 
         // angular distance in radians on a great circle
         double radDist = distance / radius;
-
+        Log.d("mmtagrad","val:"+radDist);
         double minLat = radLat - radDist;
         double maxLat = radLat + radDist;
+        Log.d("mmtagmm","valm:"+minLat+" "+maxLat);
 
         double minLon, maxLon;
         if (minLat > MIN_LAT && maxLat < MAX_LAT) {
@@ -485,9 +491,11 @@ public class PlaceListActivity extends AppCompatActivity {
     }
 
     public LatLng fromRadians(double radLat, double radLon) {
+
+       checkBounds(radLat, radLon);
        radLat = Math.toDegrees(radLat);
        radLon = Math.toDegrees(radLon);
-       //checkBounds(radLat, radLon);
+       Log.d("mmtag1","val:"+radLat+" "+radLon);
        return new LatLng(radLat, radLon);
     }
 
