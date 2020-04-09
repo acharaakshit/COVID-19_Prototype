@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -73,8 +75,11 @@ public class PlaceListActivity extends AppCompatActivity {
     //serial number of the essential places to be displayed
     int count = 1;
 
+    private ArrayAdapter adapter;
+
     private SeekBar sb_distance;
     private TextView tv_distance;
+    private EditText searchBar;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -88,6 +93,7 @@ public class PlaceListActivity extends AppCompatActivity {
         mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
         sb_distance = findViewById(R.id.sb_distance);
         tv_distance = findViewById(R.id.tv_distance);
+        searchBar = findViewById(R.id.et_searchBar);
 
         sb_distance.setMin(3);
 
@@ -95,6 +101,23 @@ public class PlaceListActivity extends AppCompatActivity {
 
         setupList(listview);
         setupSeekBar(listview, sb_distance, tv_distance);
+
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                (PlaceListActivity.this).adapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
     }
 
@@ -128,7 +151,7 @@ public class PlaceListActivity extends AppCompatActivity {
         final ArrayList<String> list = new ArrayList<String>();
 
 
-        final ArrayAdapter adapter = new ArrayAdapter(this,
+        adapter = new ArrayAdapter(this,
                 android.R.layout.simple_list_item_1, list);
         listview.setAdapter(adapter);
 
