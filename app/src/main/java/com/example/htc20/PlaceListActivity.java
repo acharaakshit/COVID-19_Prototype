@@ -348,7 +348,8 @@ public class PlaceListActivity extends AppCompatActivity {
 
                     CollectionReference addref = db.collection("store");
                     Log.d("t","value:"+addref.get());
-                    Log.d("mmtag","val:"+boundingCoordinates(PROXIMITY_RADIUS));
+                    LatLng[] latLng1 = boundingCoordinates(PROXIMITY_RADIUS);
+                    Log.d("mmtag","val:"+latLng1[0]);
 
                 }
 
