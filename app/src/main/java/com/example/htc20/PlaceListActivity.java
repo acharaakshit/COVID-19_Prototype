@@ -69,7 +69,6 @@ public class PlaceListActivity extends AppCompatActivity {
     private Button mapsAcitivity;
     final ArrayList<String> list = new ArrayList<String>();
     private EditText searchBar;
-    private ArrayAdapter adapter;
 
     // Latitudes and Longitudes of all the essential places
     double[] Latitudes;
@@ -83,6 +82,8 @@ public class PlaceListActivity extends AppCompatActivity {
     private SeekBar sb_distance;
     private TextView tv_distance;
     private ProgressBar spinner;
+
+    private ArrayAdapter adapter;
 
 
 
@@ -108,8 +109,7 @@ public class PlaceListActivity extends AppCompatActivity {
         spinner.setVisibility(View.VISIBLE);
         setupList(listview);
         setupSeekBar(listview, sb_distance, tv_distance);
-        adapter = new ArrayAdapter(this, R.layout.activity_place_list, list);
-        places_list.setAdapter(adapter);
+
 
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -119,6 +119,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.d("CHECK", "ENTERS ON TEXT CHANGES");
                 (PlaceListActivity.this).adapter.getFilter().filter(s);
             }
 
@@ -164,7 +165,7 @@ public class PlaceListActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         final int store_type = extras.getInt("number");
 
-        final ArrayAdapter adapter = new ArrayAdapter(this,
+        adapter = new ArrayAdapter(this,
                 android.R.layout.simple_list_item_1, list);
         listview.setAdapter(adapter);
 
@@ -338,17 +339,17 @@ public class PlaceListActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
+
                 }
 
             }
         });
         if(list.size()==0){
             Toast.makeText(getApplicationContext(), "There are no registered stores in this area:(", 1000).show();
-            spinner.setVisibility(View.GONE);
-        }else{
-            spinner.setVisibility(View.GONE);
 
         }
+
+        spinner.setVisibility(View.GONE);
 
         mapsAcitivity.setOnClickListener(new View.OnClickListener() {
             @Override
