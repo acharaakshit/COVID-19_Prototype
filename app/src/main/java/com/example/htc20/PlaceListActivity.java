@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -84,6 +85,11 @@ public class PlaceListActivity extends AppCompatActivity {
     private ProgressBar spinner;
 
     private ArrayAdapter adapter;
+    private static final double MIN_LAT = Math.toRadians(-90d);
+    private static final double MAX_LAT = Math.toRadians(90d);
+    private static final double MIN_LON = Math.toRadians(-180d);
+    private static final double MAX_LON = Math.toRadians(180d);
+
 
 
 
@@ -340,6 +346,10 @@ public class PlaceListActivity extends AppCompatActivity {
                         }
                     }
 
+                    CollectionReference addref = db.collection("store");
+                    Log.d("t","value:"+addref.get());
+                    Log.d("mmtag","val:"+boundingCoordinates(PROXIMITY_RADIUS));
+
                 }
 
             }
@@ -433,6 +443,54 @@ public class PlaceListActivity extends AppCompatActivity {
         builder.show();
 
     }
+
+    public LatLng boundingCoordinates(double radius) {
+        double radLat = Latitude;
+        double radLon = Longitude;
+        double distance = 6371/1000;
+        if (radius < 0d || distance < 0d)
+            throw new IllegalArgumentException();
+
+        // angular distance in radians on a great circle
+        double radDist = distance / radius;
+
+        double minLat = radLat - radDist;
+        double maxLat = radLat + radDist;
+
+        double minLon, maxLon;
+        if (minLat > MIN_LAT && maxLat < MAX_LAT) {
+            double deltaLon = Math.asin(Math.sin(radDist) /
+                    Math.cos(radLat));
+            minLon = radLon - deltaLon;
+            if (minLon < MIN_LON) minLon += 2d * Math.PI;
+            maxLon = radLon + deltaLon;
+            if (maxLon > MAX_LON) maxLon -= 2d * Math.PI;
+        } else {
+            // a pole is within the distance
+            minLat = Math.max(minLat, MIN_LAT);
+            maxLat = Math.min(maxLat, MAX_LAT);
+            minLon = MIN_LON;
+            maxLon = MAX_LON;
+        }
+
+        return(fromRadians(radLat, radLon));
+
+    }
+
+    private void checkBounds(double radLat, double radLon) {
+        if (radLat < MIN_LAT || radLat > MAX_LAT ||
+                radLon < MIN_LON || radLon > MAX_LON)
+            throw new IllegalArgumentException();
+    }
+
+    public LatLng fromRadians(double radLat, double radLon) {
+       radLat = Math.toDegrees(radLat);
+       radLon = Math.toDegrees(radLon);
+       //checkBounds(radLat, radLon);
+       return new LatLng(radLat, radLon);
+    }
+
+
 
 }
 
