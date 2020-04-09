@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -64,6 +66,10 @@ public class PlaceListActivity extends AppCompatActivity {
     private ListView places_list;
     // button to view all the nearby essential places
     private Button mapsAcitivity;
+    final ArrayList<String> list = new ArrayList<String>();
+    private EditText searchBar;
+    private ArrayAdapter adapter;
+
     // Latitudes and Longitudes of all the essential places
     double[] Latitudes;
     double[] Longitudes;
@@ -84,10 +90,12 @@ public class PlaceListActivity extends AppCompatActivity {
 
         //Initialization of Elements in layout file
         places_list = findViewById(R.id.lv_places_list);
-        final ListView listview = (ListView) findViewById(R.id.lv_places_list);
+        final ListView listview = findViewById(R.id.lv_places_list);
         mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
         sb_distance = findViewById(R.id.sb_distance);
         tv_distance = findViewById(R.id.tv_distance);
+        searchBar = findViewById(R.id.et_searchBar);
+
 
         sb_distance.setMin(3);
 
@@ -95,6 +103,25 @@ public class PlaceListActivity extends AppCompatActivity {
 
         setupList(listview);
         setupSeekBar(listview, sb_distance, tv_distance);
+        adapter = new ArrayAdapter(this, R.layout.activity_place_list, list);
+        places_list.setAdapter(adapter);
+
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                (PlaceListActivity.this).adapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
     }
 
@@ -124,7 +151,6 @@ public class PlaceListActivity extends AppCompatActivity {
     }
 
     private void setupList(final ListView listview) {
-        final ArrayList<String> list = new ArrayList<String>();
 
         //specify the type of service
         Bundle extras = getIntent().getExtras();
