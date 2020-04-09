@@ -1,9 +1,7 @@
 package com.example.htc20;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -18,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -201,7 +198,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             @SuppressLint("WrongConstant")
                             @Override
                             public void onClick(View v) {
-                                popUpEditText();
+                                startActivity(new Intent(PlaceListActivity.this, CitizenPurchaseActivity.class));
                                 dialog.cancel();
                             }
                         });
@@ -416,39 +413,39 @@ public class PlaceListActivity extends AppCompatActivity {
         Log.d("getUrl", googlePlacesUrl.toString());
         return (googlePlacesUrl.toString());
     }
-
-    private void popUpEditText() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Please enter your order:");
-
-        final EditText input = new EditText(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-            @SuppressLint("WrongConstant")
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                // do something here on OK
-                Toast.makeText(getApplicationContext(), "Order Submitted, Wait for approval", 200).show();
-                String myorder = input.getText().toString();
-                Log.d("myorder",myorder);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-
-    }
+//
+//    private void popUpEditText() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Please enter your order:");
+//
+//        final EditText input = new EditText(this);
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.MATCH_PARENT);
+//        input.setLayoutParams(lp);
+//        builder.setView(input);
+//
+//        // Set up the buttons
+//        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+//            @SuppressLint("WrongConstant")
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//
+//                // do something here on OK
+//                Toast.makeText(getApplicationContext(), "Order Submitted, Wait for approval", 200).show();
+//                String myorder = input.getText().toString();
+//                Log.d("myorder",myorder);
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//        builder.show();
+//
+//    }
 
     public LatLng[] boundingCoordinates(double distance) {
         double radLat = Math.toRadians(Latitude);
