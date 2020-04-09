@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,6 +82,9 @@ public class PlaceListActivity extends AppCompatActivity {
 
     private SeekBar sb_distance;
     private TextView tv_distance;
+    private ProgressBar spinner;
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -95,12 +99,13 @@ public class PlaceListActivity extends AppCompatActivity {
         sb_distance = findViewById(R.id.sb_distance);
         tv_distance = findViewById(R.id.tv_distance);
         searchBar = findViewById(R.id.et_searchBar);
+        spinner = (ProgressBar)findViewById(R.id.progressBar1);
 
-
-        sb_distance.setMin(3);
+        sb_distance.setMin(1);
 
         tv_distance.setText("Proximity Radius: " + sb_distance.getMin() * 0.5 + " km.");
 
+        spinner.setVisibility(View.VISIBLE);
         setupList(listview);
         setupSeekBar(listview, sb_distance, tv_distance);
         adapter = new ArrayAdapter(this, R.layout.activity_place_list, list);
@@ -145,11 +150,14 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 count = 1;
                 PROXIMITY_RADIUS = progressValue[0] * 500;
+                //clear the list again and call setuplist
+                list.clear();
                 setupList(listview);
             }
         });
     }
 
+    @SuppressLint("WrongConstant")
     private void setupList(final ListView listview) {
 
         //specify the type of service
@@ -286,7 +294,7 @@ public class PlaceListActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-
+                    Log.d("listlog","val:"+list.size());
                     db = FirebaseFirestore.getInstance();
 
                     Latitudes = new double[placesCount];
@@ -334,6 +342,13 @@ public class PlaceListActivity extends AppCompatActivity {
 
             }
         });
+        if(list.size()==0){
+            Toast.makeText(getApplicationContext(), "There are no registered stores in this area:(", 1000).show();
+            spinner.setVisibility(View.GONE);
+        }else{
+            spinner.setVisibility(View.GONE);
+
+        }
 
         mapsAcitivity.setOnClickListener(new View.OnClickListener() {
             @Override
