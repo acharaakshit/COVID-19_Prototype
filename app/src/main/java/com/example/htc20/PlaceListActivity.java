@@ -444,7 +444,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
     }
 
-    public LatLng boundingCoordinates(double radius) {
+    public LatLng[] boundingCoordinates(double radius) {
         double radLat = Latitude;
         double radLon = Longitude;
         double distance = 6371/1000;
@@ -473,7 +473,7 @@ public class PlaceListActivity extends AppCompatActivity {
             maxLon = MAX_LON;
         }
 
-        return(fromRadians(radLat, radLon));
+        return new LatLng[]{ fromRadians(minLat, minLon), fromRadians(maxLat, maxLon) };
 
     }
 
