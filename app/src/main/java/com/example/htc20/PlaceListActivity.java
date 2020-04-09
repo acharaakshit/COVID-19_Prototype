@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -75,11 +73,8 @@ public class PlaceListActivity extends AppCompatActivity {
     //serial number of the essential places to be displayed
     int count = 1;
 
-    private ArrayAdapter adapter;
-
     private SeekBar sb_distance;
     private TextView tv_distance;
-    private EditText searchBar;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -93,7 +88,6 @@ public class PlaceListActivity extends AppCompatActivity {
         mapsAcitivity = findViewById(R.id.btn_mapsActivityLauncher);
         sb_distance = findViewById(R.id.sb_distance);
         tv_distance = findViewById(R.id.tv_distance);
-        searchBar = findViewById(R.id.et_searchBar);
 
         sb_distance.setMin(3);
 
@@ -101,23 +95,6 @@ public class PlaceListActivity extends AppCompatActivity {
 
         setupList(listview);
         setupSeekBar(listview, sb_distance, tv_distance);
-
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                (PlaceListActivity.this).adapter.getFilter().filter(s);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
 
     }
 
@@ -141,7 +118,6 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 count = 1;
                 PROXIMITY_RADIUS = progressValue[0] * 500;
-                count = 1;
                 setupList(listview);
             }
         });
@@ -150,8 +126,11 @@ public class PlaceListActivity extends AppCompatActivity {
     private void setupList(final ListView listview) {
         final ArrayList<String> list = new ArrayList<String>();
 
+        //specify the type of service
+        Bundle extras = getIntent().getExtras();
+        final int store_type = extras.getInt("number");
 
-        adapter = new ArrayAdapter(this,
+        final ArrayAdapter adapter = new ArrayAdapter(this,
                 android.R.layout.simple_list_item_1, list);
         listview.setAdapter(adapter);
 
@@ -161,40 +140,81 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String n = listview.getItemAtPosition(position).toString();
                 final int index = n.charAt(0) - '1';
+
                 //add pop up with two buttons
+                if(store_type == 1 || store_type == 2 || store_type == 4) {
 
-                Dialog dialog = new Dialog(PlaceListActivity.this);
-                dialog.setContentView(R.layout.custom_dialog_layout);
-                Button order = (Button)dialog.getWindow().findViewById(R.id.btn_order);
-                Button directions = (Button)dialog.getWindow().findViewById(R.id.btn_directions);
-                order.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("WrongConstant")
-                    @Override
-                    public void onClick(View v) {
-                       //give order
-                        popUpEditText();
+                    final Dialog dialog = new Dialog(PlaceListActivity.this);
+                    dialog.setContentView(R.layout.custom_dialog_layout);
+
+                    Button one = (Button) dialog.getWindow().findViewById(R.id.btn_1);
+                    Button two = (Button) dialog.getWindow().findViewById(R.id.btn_2);
+
+
+                    if (store_type == 1 || store_type == 2) {
+
+                        one.setText("order");
+                        two.setText("directions");
+
+                        one.setOnClickListener(new View.OnClickListener() {
+                            @SuppressLint("WrongConstant")
+                            @Override
+                            public void onClick(View v) {
+                                popUpEditText();
+                                dialog.cancel();
+                            }
+                        });
+                        two.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                Intent i = new Intent(android.content.Intent.ACTION_VIEW,
+                                        Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
+                                i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                                startActivity(i);
+                                dialog.cancel();
+                            }
+                        });
+                    }else if (store_type == 4){
+
+                        one.setText("Yes");
+                        two.setText("No");
+
+                        //TextView textcontent = (TextView)findViewById(R.id.txt_dia);
+                        //Log.d("txt",textcontent.getText().toString());
+                        
+                        one.setOnClickListener(new View.OnClickListener() {
+                            @SuppressLint("WrongConstant")
+                            @Override
+                            public void onClick(View v) {
+                                //add lcc as corona patient
+                                Toast.makeText(getApplicationContext(), "Response Submitted!", 200).show();
+                            }
+                        });
+
+                        two.setOnClickListener(new View.OnClickListener() {
+                            @SuppressLint("WrongConstant")
+                            @Override
+                            public void onClick(View v) {
+                                //add lcc as normal patient
+                                Toast.makeText(getApplicationContext(), "Response Submitted!", 200).show();
+                            }
+                        });
                     }
-                });
-                directions.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                        dialog.show();
 
-                        Intent i = new Intent(android.content.Intent.ACTION_VIEW,
-                                Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
-                        i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
-                        startActivity(i);
-                    }
-                });
-                dialog.show();
-
+                }else{
+                    Intent i = new Intent(android.content.Intent.ACTION_VIEW,
+                            Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
+                    i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                    startActivity(i);
+                }
 
             }
         });
 
-        //specify the type of service
-        Bundle extras = getIntent().getExtras();
-        final int store_type = extras.getInt("number");
-        //
+
+
         client = LocationServices.getFusedLocationProviderClient(this);
         client.getLastLocation().addOnSuccessListener(PlaceListActivity.this, new OnSuccessListener<Location>() {
             @Override
@@ -222,7 +242,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             case 1:     nearbyPlace = "pharmacy|drugstore";    break;
                             case 2:     nearbyPlace = "grocery_or_supermarket";     break;
                             case 3:     nearbyPlace = "atm";   break;
-                            case 4:     nearbyPlace = "department_store";   break;
+                            case 4:     nearbyPlace = "hospital";   break;
                             default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                         }
 
@@ -295,9 +315,9 @@ public class PlaceListActivity extends AppCompatActivity {
                 Uri gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude);
                 switch (store_type) {
                     case 1:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=pharmacy|drugstore"); break;
-                    case 2:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket");  break;
+                    case 2:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket|store");  break;
                     case 3:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=atm");  break;
-                    case 4:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=department_store");
+                    case 4:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital");
                     default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                 }
 
@@ -313,34 +333,28 @@ public class PlaceListActivity extends AppCompatActivity {
     private JSONArray getAllresults(double Latitude,double  Longitude, String nearbyPlace) throws UnsupportedEncodingException, ExecutionException, InterruptedException, JSONException {
 
         String strUrl = null;
-        String next_page_token = "";
         String jsonOutput = null;
         JSONObject jsonObject = null;
 
-        strUrl = getUrl(Latitude, Longitude, nearbyPlace, next_page_token);
+        strUrl = getUrl(Latitude, Longitude, nearbyPlace);
         jsonOutput = new RequestJsonPlaces().execute(strUrl).get();
         jsonObject = new JSONObject((String) jsonOutput);
         Log.d("mytag","value:"+jsonObject);
         JSONArray jsonArray1 = jsonObject.getJSONArray("results");
         Log.d("mytag","value: "+jsonArray1.length());
-
         return  jsonArray1;
     }
 
 
-    private String getUrl(double latitude, double longitude, String nearbyPlace, String next_page_token) throws UnsupportedEncodingException {
+    private String getUrl(double latitude, double longitude, String nearbyPlace) throws UnsupportedEncodingException {
 
         StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlacesUrl.append("location=" + latitude + "," + longitude);
         googlePlacesUrl.append("&radius="+PROXIMITY_RADIUS);
         googlePlacesUrl.append("&types=" + URLEncoder.encode(nearbyPlace,"UTF-8"));
         googlePlacesUrl.append("&sensor=false");
-        googlePlacesUrl.append("hasNextPage=true&nextPage()=true");
+        //googlePlacesUrl.append("hasNextPage=true&nextPage()=true");
         googlePlacesUrl.append("&key=" + "AIzaSyBpsUyOqhq0MOBN0abTsFFlrAa4WUqkzQQ");
-        if (next_page_token == "");
-        else
-            googlePlacesUrl.append("&pagetoken="+next_page_token);
-
         Log.d("getUrl", googlePlacesUrl.toString());
         return (googlePlacesUrl.toString());
     }
@@ -357,16 +371,15 @@ public class PlaceListActivity extends AppCompatActivity {
         builder.setView(input);
 
         // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @SuppressLint("WrongConstant")
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                // do something
-                Toast.makeText(getApplicationContext(),"Order Submitted", 200).show();
-                String cust_order = input.getText().toString();
-                Log.d("order","val: "+cust_order);
-
+                // do something here on OK
+                Toast.makeText(getApplicationContext(), "Order Submitted, Wait for approval", 200).show();
+                String myorder = input.getText().toString();
+                Log.d("myorder",myorder);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

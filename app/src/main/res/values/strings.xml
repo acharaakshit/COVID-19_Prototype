@@ -32,18 +32,17 @@
 
     <string name="set_uniqueID">Set Unique ID</string>
     <string name="set_password">Set Password</string>
-    <string name="shop_name">Enter Shop Name</string>
-    <string name="shop_loc">Provide Shop Location</string>
-    <string name="shop_type">Provide Shop Type</string>
+    <string name="shop_name">Enter Service Name</string>
+    <string name="shop_type">Provide Service Type</string>
     <string name="service_prompt">Choose a Service category</string>
 
     <string-array name="service_arrays">
-        <item>Hospitals</item>
-        <item>Medical Stores</item>
-        <item>Supermarkets</item>
-        <item>Grocery Shops</item>
-        <item>Banks</item>
-        <item>ATMs</item>
+        <item>Hospital</item>
+        <item>Medical Store</item>
+        <item>Supermarket</item>
+        <item>Grocery Shop</item>
+        <item>Bank</item>
+        <item>ATM</item>
     </string-array>
 
 
@@ -66,5 +65,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="citizen_dashboard">Citizen Dashboard</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="hospitals">HOSPITALS</string>
+    <string name="groceries">GROCERIES</string>
+    <string name="pharmacies">PHARMACIES</string>
+    <string name="atms">ATMS</string>
+    <string name="banks">BANKS</string>
 </resources>
 

@@ -40,7 +40,6 @@ public class StoreRegistrationActivity extends AppCompatActivity {
     private TextView userLogin;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore db;
-    private MapsActivity map;
     private Spinner service_category;
     private FusedLocationProviderClient client;
     private final int REQUEST_LOCATION_PERMISSION = 1;
@@ -106,15 +105,17 @@ public class StoreRegistrationActivity extends AppCompatActivity {
                             if (location != null){
                                 Latitude =  location.getLatitude();
                                 Longitude = location.getLongitude();
-                                Log.d("Latitude", "value: "+Latitude);
+                                Log.d("Latitude", "value: " + Latitude);
                                 //GeoPoint gp = new GeoPoint(Latitude , Longitude);
                                 //Log.d("gp", "val: "+gp);
                                 //user.put("shop_loc", gp);
                             }
                         }
                     });
-                        user.put("latitude",Latitude);
-                        user.put("longitude",Longitude);
+                    int lcc = 0;
+                    user.put("lcc", 0);
+                    user.put("latitude", Latitude);
+                    user.put("longitude", Longitude);
                     db.collection("store")
                             .document(strUniqueID)
                             .set(user)
