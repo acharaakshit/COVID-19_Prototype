@@ -1,9 +1,7 @@
 package com.example.htc20;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -18,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -54,7 +51,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,7 +199,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             @SuppressLint("WrongConstant")
                             @Override
                             public void onClick(View v) {
-                                popUpEditText();
+
                                 dialog.cancel();
                             }
                         });
@@ -373,24 +369,11 @@ public class PlaceListActivity extends AppCompatActivity {
                     Query addquery = addref.whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude).
                             whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
 
-                    queryfun(addquery, new LoadDBData.LoadingListener() {
-                        @Override
-                        public void OnSuccess(List data) {
-                            //data is the result from the first query
-                            Log.d("data","val:"+data);
-                            Collections.copy(data,Str1);
-                        }
-                    });
+                    queryfun(addquery);
 
                     addquery = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude).
                             whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
-                    queryfun(addquery, new LoadDBData.LoadingListener() {
-                        @Override
-                        public void OnSuccess(List data) {
-                            Log.d("data2","val:"+data);
-                            Collections.copy(data,Str2);
-                        }
-                    });
+                    queryfun(addquery);
 
                     Log.d("taggg","val: "+Str1);
 
@@ -439,7 +422,7 @@ public class PlaceListActivity extends AppCompatActivity {
         });
     }
 
-    private List queryfun(Query addquery, final LoadDBData.LoadingListener userlistener){
+    private List queryfun(Query addquery){
 
         final List str = new ArrayList<String>();
         final int count = 0;
@@ -454,7 +437,6 @@ public class PlaceListActivity extends AppCompatActivity {
                         Log.d("count","val:"+count);
                         Log.d("str","val"+strr);
                     }
-                    userlistener.OnSuccess(strr);
                 }
             }
 
@@ -492,38 +474,6 @@ public class PlaceListActivity extends AppCompatActivity {
         return (googlePlacesUrl.toString());
     }
 
-    private void popUpEditText() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Please enter your order:");
-
-        final EditText input = new EditText(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        builder.setView(input);
-
-        // Set up the buttons
-        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
-            @SuppressLint("WrongConstant")
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                // do something here on OK
-                Toast.makeText(getApplicationContext(), "Order Submitted, Wait for approval", 200).show();
-                String myorder = input.getText().toString();
-                Log.d("myorder",myorder);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
-
-    }
 
     public LatLng[] boundingCoordinates(double distance) {
         double radLat = Math.toRadians(Latitude);
@@ -576,14 +526,6 @@ public class PlaceListActivity extends AppCompatActivity {
 
 
 
-}
-
-//interface to get the data from the listener
-class LoadDBData {
-
-    public interface LoadingListener {
-        void OnSuccess(List data);
-    }
 }
 
 class RequestJsonPlaces extends AsyncTask<String, String, String> {
