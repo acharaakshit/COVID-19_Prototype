@@ -22,6 +22,8 @@ public class DashboardCitizenActivity extends AppCompatActivity {
     private Button getGroceries;
     private Button getBanks;
     private Button getHospitals;
+    private Button getAtms;
+    private Button getShops;
 
     private FloatingActionButton Fab;
     private final int REQUEST_LOCATION_PERMISSION = 1;
@@ -72,6 +74,25 @@ public class DashboardCitizenActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
                 i.putExtra("number", 4);
+                startActivity(i);
+            }
+        });
+
+        getAtms = findViewById(R.id.btn_Atms);
+        getAtms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
+                i.putExtra("number", 2);
+                startActivity(i);
+            }
+        });
+        getShops = findViewById(R.id.btn_Shops);
+        getShops.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(DashboardCitizenActivity.this, PlaceListActivity.class);
+                i.putExtra("number", 2);
                 startActivity(i);
             }
         });
