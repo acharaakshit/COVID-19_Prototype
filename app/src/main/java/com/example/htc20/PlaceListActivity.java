@@ -56,8 +56,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -369,29 +367,47 @@ public class PlaceListActivity extends AppCompatActivity {
                     LatLng[] latLng1 = boundingCoordinates(PROXIMITY_RADIUS);
                     Log.d("mmtag", "val:" + latLng1[0]);
 
+                    final List<String> Str1 = new ArrayList<>();
+                    final List<String> Str2 = new ArrayList<>();
+
                     Query addquery = addref.whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude).
                             whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
-                    List Str1 = queryfun(addquery);
+
+                    queryfun(addquery, new LoadDBData.LoadingListener() {
+                        @Override
+                        public void OnSuccess(List data) {
+                            //data is the result from the first query
+                            Log.d("data","val:"+data);
+                            Collections.copy(data,Str1);
+                        }
+                    });
+
                     addquery = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude).
                             whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
-                    List Str2 = queryfun(addquery);
+                    queryfun(addquery, new LoadDBData.LoadingListener() {
+                        @Override
+                        public void OnSuccess(List data) {
+                            Log.d("data2","val:"+data);
+                            Collections.copy(data,Str2);
+                        }
+                    });
+
                     Log.d("taggg","val: "+Str1);
 
-                    if (Str1.size() != 0 && Str2.size() !=0 ) {
-                        List<List<String>> Strlist = new ArrayList<List<String>>(Str1);
-                        Strlist.retainAll(Str2);
+                    /*if (Str1.size() != 0 && Str2.size() !=0 ) {
+                        Str1.retainAll(Str2);
 
                         Log.d("taggg","val: "+Str1);
 
 
-                        Iterator iterator = Strlist.iterator();
+                        Iterator iterator = Str1.iterator();
                         while (iterator.hasNext()) {
                             list.add((String) iterator.next());
                         }
                         //remove duplicates from the list
                         list = new ArrayList<String>(new LinkedHashSet<String>(list));
 
-                    }
+                    }*/
                 }
             }
         });
@@ -423,7 +439,7 @@ public class PlaceListActivity extends AppCompatActivity {
         });
     }
 
-    private List queryfun(Query addquery){
+    private List queryfun(Query addquery, final LoadDBData.LoadingListener userlistener){
 
         final List str = new ArrayList<String>();
         final int count = 0;
@@ -438,9 +454,10 @@ public class PlaceListActivity extends AppCompatActivity {
                         Log.d("count","val:"+count);
                         Log.d("str","val"+strr);
                     }
+                    userlistener.OnSuccess(strr);
                 }
             }
-            Collections.copy(strr,str);
+
         });
 
         return str;
@@ -559,6 +576,14 @@ public class PlaceListActivity extends AppCompatActivity {
 
 
 
+}
+
+//interface to get the data from the listener
+class LoadDBData {
+
+    public interface LoadingListener {
+        void OnSuccess(List data);
+    }
 }
 
 class RequestJsonPlaces extends AsyncTask<String, String, String> {
