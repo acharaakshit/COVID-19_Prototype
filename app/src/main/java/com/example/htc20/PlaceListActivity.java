@@ -368,21 +368,20 @@ public class PlaceListActivity extends AppCompatActivity {
                     LatLng[] latLng1 = boundingCoordinates(PROXIMITY_RADIUS);
                     Log.d("mmtag", "val:" + latLng1[0]);
 
-                    Query addquery = addref.orderBy("latitude").whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude);
+                    Query addquery = addref.whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude).
+                            whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
                     List Str1 = queryfun(addquery);
-                    addquery = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude);
+                    addquery = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude).
+                            whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
                     List Str2 = queryfun(addquery);
-                    addquery = addref.whereLessThanOrEqualTo("latitude", latLng1[1].latitude);
-                    List Str3 = queryfun(addquery);
-                    addquery = addref.whereLessThanOrEqualTo("longitude", latLng1[1].longitude);
-                    List Str4 = queryfun(addquery);
+                    Log.d("taggg","val: "+Str1);
 
-                    if (Str1.size() != 0 && Str2.size() !=0 && Str3.size() != 0 && Str4.size()!=0 ) {
+                    if (Str1.size() != 0 && Str2.size() !=0 ) {
                         List<List<String>> Strlist = new ArrayList<List<String>>(Str1);
                         Strlist.retainAll(Str2);
-                        Strlist.retainAll(Str3);
-                        Strlist.retainAll(Str4);
-                        //Strlists.add(Str1); Strlists.add(Str2); Strlists.add(Str3); Strlists.add(Str4);
+
+                        Log.d("taggg","val: "+Str1);
+
 
                         Iterator iterator = Strlist.iterator();
                         while (iterator.hasNext()) {
