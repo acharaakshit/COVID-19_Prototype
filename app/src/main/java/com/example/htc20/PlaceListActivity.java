@@ -55,6 +55,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -68,7 +71,7 @@ public class PlaceListActivity extends AppCompatActivity {
     private ListView places_list;
     // button to view all the nearby essential places
     private Button mapsAcitivity;
-    final ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<String>();
     private EditText searchBar;
 
     // Latitudes and Longitudes of all the essential places
@@ -230,6 +233,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             public void onClick(View v) {
                                 //add lcc as corona patient
                                 Toast.makeText(getApplicationContext(), "Response Submitted!", 200).show();
+                                dialog.cancel();
                             }
                         });
 
@@ -239,6 +243,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             public void onClick(View v) {
                                 //add lcc as normal patient
                                 Toast.makeText(getApplicationContext(), "Response Submitted!", 200).show();
+                                dialog.cancel();
                             }
                         });
                     }
@@ -257,6 +262,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
 
         client = LocationServices.getFusedLocationProviderClient(this);
+
         client.getLastLocation().addOnSuccessListener(PlaceListActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
@@ -279,13 +285,22 @@ public class PlaceListActivity extends AppCompatActivity {
                     int placesCount = 0;
 
 
-                        switch (store_type) {
-                            case 1:     nearbyPlace = "pharmacy|drugstore";    break;
-                            case 2:     nearbyPlace = "grocery_or_supermarket";     break;
-                            case 3:     nearbyPlace = "atm";   break;
-                            case 4:     nearbyPlace = "hospital";   break;
-                            default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
-                        }
+                    switch (store_type) {
+                        case 1:
+                            nearbyPlace = "pharmacy|drugstore";
+                            break;
+                        case 2:
+                            nearbyPlace = "grocery_or_supermarket";
+                            break;
+                        case 3:
+                            nearbyPlace = "atm";
+                            break;
+                        case 4:
+                            nearbyPlace = "hospital";
+                            break;
+                        default:
+                            Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
+                    }
 
                     try {
                         jsonArray = getAllresults(Latitude, Longitude, nearbyPlace);
@@ -301,7 +316,7 @@ public class PlaceListActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    Log.d("listlog","val:"+list.size());
+                    Log.d("listlog", "val:" + list.size());
                     db = FirebaseFirestore.getInstance();
 
                     Latitudes = new double[placesCount];
@@ -345,19 +360,39 @@ public class PlaceListActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
+
                     //append the registered stores in the proximity radius to the list
                     CollectionReference addref = db.collection("store");
-                    Log.d("t","value:"+addref.get());
+
                     //get the minimum and maximum latitudes and longitudes
                     LatLng[] latLng1 = boundingCoordinates(PROXIMITY_RADIUS);
-                    Log.d("mmtag","val:"+latLng1[0]);
+                    Log.d("mmtag", "val:" + latLng1[0]);
 
-                    Query addquery =  addref.whereGreaterThanOrEqualTo("latitude",latLng1[0].latitude);
-                    addquery =   addref.whereGreaterThanOrEqualTo("longitude",latLng1[0].longitude);
-                    addquery =   addref.whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
-                    addquery =   addref.whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
+                    Query addquery = addref.orderBy("latitude").whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude);
+                    List Str1 = queryfun(addquery);
+                    addquery = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude);
+                    List Str2 = queryfun(addquery);
+                    addquery = addref.whereLessThanOrEqualTo("latitude", latLng1[1].latitude);
+                    List Str3 = queryfun(addquery);
+                    addquery = addref.whereLessThanOrEqualTo("longitude", latLng1[1].longitude);
+                    List Str4 = queryfun(addquery);
+
+                    if (Str1.size() != 0 && Str2.size() !=0 && Str3.size() != 0 && Str4.size()!=0 ) {
+                        List<List<String>> Strlist = new ArrayList<List<String>>(Str1);
+                        Strlist.retainAll(Str2);
+                        Strlist.retainAll(Str3);
+                        Strlist.retainAll(Str4);
+                        //Strlists.add(Str1); Strlists.add(Str2); Strlists.add(Str3); Strlists.add(Str4);
+
+                        Iterator iterator = Strlist.iterator();
+                        while (iterator.hasNext()) {
+                            list.add((String) iterator.next());
+                        }
+                        //remove duplicates from the list
+                        list = new ArrayList<String>(new LinkedHashSet<String>(list));
+
+                    }
                 }
-
             }
         });
         if(list.size()==0){
@@ -386,6 +421,26 @@ public class PlaceListActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private List queryfun(Query addquery){
+
+        final List str = new ArrayList<String>();
+        final int count = 0;
+        addquery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        str.add(((String) document.getData().get("shop_name")));
+                        Log.d("count","val:"+count);
+                        Log.d("str","val"+str);
+                    }
+                }
+            }
+        });
+        return str;
     }
 
     private JSONArray getAllresults(double Latitude,double  Longitude, String nearbyPlace) throws UnsupportedEncodingException, ExecutionException, InterruptedException, JSONException {
