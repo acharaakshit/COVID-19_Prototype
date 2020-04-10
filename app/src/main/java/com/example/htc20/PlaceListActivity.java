@@ -54,9 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class PlaceListActivity extends AppCompatActivity {
@@ -335,23 +333,9 @@ public class PlaceListActivity extends AppCompatActivity {
                             Longitudes[i] = Double.parseDouble(PlaceLong);
                             CollectionReference ref = db.collection("store");
                             Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
-                            final Map<String, Integer> user = new HashMap<>();
-                            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    int lcc;
-                                    if (task.isSuccessful()) {
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            lcc = Integer.parseInt((String) document.getData().get("lcc"));
-                                            user.put("lcc", lcc);
-                                        }
-                                    }
-                                }
-                            });
-                            Integer lcc = user.get("lcc");
-                            list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
+                            queryfunLcc(query, PlaceName, count);
                             count++;
-                            adapter.notifyDataSetChanged();
+
                             //parsing to be done
                         } catch (JSONException e) {
                             Log.d("Places", "Error in Adding places");
@@ -372,11 +356,10 @@ public class PlaceListActivity extends AppCompatActivity {
                     Query addquery = addref.whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude).
                             whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
 
-                    queryfun(addquery);
-
-                    addquery = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude).
+                   Query addquery1 = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude).
                             whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
-                    queryfun(addquery);
+
+                   queryfunArraylist(addquery, addquery1, "shop_name");
 
                     Log.d("taggg","val: "+Str1);
 
@@ -425,7 +408,24 @@ public class PlaceListActivity extends AppCompatActivity {
         });
     }
 
-    private List queryfun(Query addquery){
+    private void queryfunLcc(Query query, final String PlaceName, final Integer count){
+
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Integer lcc = 0;
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        //string containing the nearby stores
+                        lcc = (Integer) document.getData().get("lcc");
+                    }
+                    updateLCC(lcc, PlaceName, count );
+                }
+            }
+        });
+    }
+
+    private void queryfunArraylist(Query addquery, Query addquery1, String getField) {
 
         final List str = new ArrayList<String>();
 
@@ -433,18 +433,43 @@ public class PlaceListActivity extends AppCompatActivity {
 
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
+                ArrayList<String> strr = new ArrayList<>();
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        document.getData().get("shop_name").toString();
-
+                        //string containing the nearby stores
+                        strr.add(document.getData().get("shop_name").toString());
                     }
+                    updatelist(strr);
+                }
+            }
+
+        });
+        addquery1.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                ArrayList<String> strr = new ArrayList<>();
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        //string containing the nearby stores
+                        strr.add(document.getData().get("shop_name").toString());
+                    }
+                    updatelist(strr);
                 }
             }
 
         });
 
-        return str;
+    }
+    private void updateLCC(Integer lcc, String PlaceName, Integer count){
+        list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
+        adapter.notifyDataSetChanged();
+
+    }
+    private void updatelist(ArrayList<String> element){
+
+        //list.add(element);
+        //adapter.notifyDataSetChanged();
     }
 
     private JSONArray getAllresults(double Latitude,double  Longitude, String nearbyPlace) throws UnsupportedEncodingException, ExecutionException, InterruptedException, JSONException {
