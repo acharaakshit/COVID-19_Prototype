@@ -287,10 +287,12 @@ public class PlaceListActivity extends AppCompatActivity {
                         try {
                             jsonObject = (JSONObject) jsonArray.get(i);
                             temp_loc = new NearbyPlaces(jsonObject.getString("name"), Double.parseDouble(jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lat")), Double.parseDouble(jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng")));
+                            nearbyList.add(temp_loc);
 
                             // Redefine this part of the call
+                            Log.d("mytag", "First Point");
                             CollectionReference ref = db.collection("store");
-                            Query query = ref.whereEqualTo("latitude", nearbyList.get(i).getLatitude()).whereEqualTo("longitude", nearbyList.get(i).getLongitude());
+                            Query query = ref.whereEqualTo("latitude", temp_loc.getLatitude()).whereEqualTo("longitude", temp_loc.getLongitude());
                             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -304,7 +306,6 @@ public class PlaceListActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-                            nearbyList.add(temp_loc);
                             count++;
                             adapter.notifyDataSetChanged();
                         } catch (JSONException e) {
@@ -341,6 +342,7 @@ public class PlaceListActivity extends AppCompatActivity {
     }
 
     private void updateDisplayLCC(Integer lcc, String doc_id){
+        Log.d("mytag", "I have reached here");
         list.add(count + ". " + temp_loc.getPlaceName() + "\t\t: " + String.valueOf(lcc));
     }
 
