@@ -54,6 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -365,10 +366,7 @@ public class PlaceListActivity extends AppCompatActivity {
                         Log.d("taggg","val: "+Str1);
 
 
-                        Iterator iterator = Str1.iterator();
-                        while (iterator.hasNext()) {
-                            list.add((String) iterator.next());
-                        }
+
                         //remove duplicates from the list
                         list = new ArrayList<String>(new LinkedHashSet<String>(list));
 
@@ -470,11 +468,16 @@ public class PlaceListActivity extends AppCompatActivity {
         Log.d("taggg","val: "+RegStores);
         if(RegStores.size() > 1){
             RegStores.get(0).retainAll(RegStores.get(1));
-            list.add(String.valueOf(RegStores.get(0)));
+            Iterator iterator = RegStores.get(0).iterator();
+            while (iterator.hasNext()) {
+                list.add((String) iterator.next());
+                adapter.notifyDataSetChanged();
+            }
+
         }
 
         //list.add(element);
-        //adapter.notifyDataSetChanged();
+
     }
 
     private JSONArray getAllresults(double Latitude,double  Longitude, String nearbyPlace) throws UnsupportedEncodingException, ExecutionException, InterruptedException, JSONException {
