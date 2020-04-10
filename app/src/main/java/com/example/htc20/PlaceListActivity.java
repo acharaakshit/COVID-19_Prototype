@@ -54,6 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -427,18 +428,21 @@ public class PlaceListActivity extends AppCompatActivity {
         final List str = new ArrayList<String>();
         final int count = 0;
         addquery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            List strr = new ArrayList<String>();
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
 
+                if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        str.add(((String) document.getData().get("shop_name")));
+                        strr.add(((String) document.getData().get("shop_name")));
                         Log.d("count","val:"+count);
-                        Log.d("str","val"+str);
+                        Log.d("str","val"+strr);
                     }
                 }
             }
+            Collections.copy(strr,str);
         });
+
         return str;
     }
 
