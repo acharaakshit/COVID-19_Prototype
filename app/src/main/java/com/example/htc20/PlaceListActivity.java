@@ -425,17 +425,16 @@ public class PlaceListActivity extends AppCompatActivity {
     private List queryfun(Query addquery){
 
         final List str = new ArrayList<String>();
-        final int count = 0;
+
         addquery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            List strr = new ArrayList<String>();
+
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        strr.add(((String) document.getData().get("shop_name")));
-                        Log.d("count","val:"+count);
-                        Log.d("str","val"+strr);
+                        document.getData().get("shop_name");
+
                     }
                 }
             }
