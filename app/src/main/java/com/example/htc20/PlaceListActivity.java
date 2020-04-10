@@ -54,6 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -91,6 +92,9 @@ public class PlaceListActivity extends AppCompatActivity {
     private static final double MIN_LON = Math.toRadians(-180d);
     private static final double MAX_LON = Math.toRadians(180d);
     ArrayList<ArrayList<String>> RegStores = new ArrayList<ArrayList<String>>();
+
+    HashMap<String, Point> mapCoordinates = new HashMap<>();
+
 
 
 
@@ -181,9 +185,9 @@ public class PlaceListActivity extends AppCompatActivity {
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String n = listview.getItemAtPosition(position).toString();
-                final int index = n.charAt(0) - '1';
-
+                final String n = listview.getItemAtPosition(position).toString();
+                final int index = n.indexOf('\t');
+                final String name = n.substring(0, index);
                 //add pop up with two buttons
                 if(store_type == 1 || store_type == 2 || store_type == 4) {
 
@@ -212,7 +216,7 @@ public class PlaceListActivity extends AppCompatActivity {
                             public void onClick(View v) {
 
                                 Intent i = new Intent(android.content.Intent.ACTION_VIEW,
-                                        Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
+                                        Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (mapCoordinates.get(name).lattitude) + "," + (mapCoordinates.get(name).longitude)));
                                 i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                                 startActivity(i);
                                 dialog.cancel();
@@ -334,6 +338,8 @@ public class PlaceListActivity extends AppCompatActivity {
                             Log.d("Longitudes", "valueLong : " + PlaceLong);
                             Latitudes[i] = Double.parseDouble(PlaceLat);
                             Longitudes[i] = Double.parseDouble(PlaceLong);
+                            Point p = new Point(Latitudes[i], Longitudes[i]);
+                            mapCoordinates.put(PlaceName, p);
                             CollectionReference ref = db.collection("store");
                             Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
                             queryfunLcc(query, PlaceName, count);
@@ -459,7 +465,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
     }
     synchronized private void updateLCC(Integer lcc, String PlaceName, Integer count){
-        list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
+        list.add(PlaceName + "\t\t: " + String.valueOf(lcc));
         adapter.notifyDataSetChanged();
 
     }
@@ -643,5 +649,15 @@ class NoteRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public int getItemCount() {
         return 0;
+    }
+}
+
+class Point {
+    double lattitude;
+    double longitude;
+
+    public Point(double lattitude, double longitude) {
+        this.lattitude = lattitude;
+        this.longitude = longitude;
     }
 }
