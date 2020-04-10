@@ -427,9 +427,8 @@ public class PlaceListActivity extends AppCompatActivity {
                         //string containing the nearby stores
                         lcc = (Integer)document.get("lcc");
                         Log.d("LCC","val:"+document.contains("lcc"));
-                        Log.d("LCC1", (String) document.get("email"));
                         strr.add(document.getData().get("shop_name").toString()+"\t\t:"+lcc);
-                        //+ ": "+document.getData().get("lcc").toString() -- show null
+
                     }
                     updatelist(strr);
                 }
@@ -442,12 +441,12 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 ArrayList<String> strr = new ArrayList<>();
                 if (task.isSuccessful()) {
-                    Object lcc = 0;
+                    Integer lcc = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
-                        lcc = document.getData().get("lcc");
+                        lcc = (Integer) document.getData().get("lcc");
                         strr.add(document.getData().get("shop_name").toString()+"\t\t:"+lcc);
-                        //+ ": "+document.getData().get("lcc").toString() -- show null
+
                     }
                     updatelist(strr);
                 }
@@ -475,8 +474,6 @@ public class PlaceListActivity extends AppCompatActivity {
             list = new ArrayList<String>(new LinkedHashSet<String>(list));
             adapter.notifyDataSetChanged();
         }
-
-        //list.add(element);
 
     }
 
