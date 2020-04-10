@@ -2,7 +2,6 @@ package com.example.htc20;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
@@ -13,7 +12,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,7 +25,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -367,17 +364,6 @@ public class PlaceListActivity extends AppCompatActivity {
 
                    queryfunArraylist(addquery, addquery1);
 
-                    /*if (Str1.size() != 0 && Str2.size() !=0 ) {
-                        Str1.retainAll(Str2);
-
-                        Log.d("taggg","val: "+Str1);
-
-
-
-                        //remove duplicates from the list
-
-
-                    }*/
                 }
             }
         });
@@ -436,9 +422,11 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 ArrayList<String> strr = new ArrayList<>();
                 if (task.isSuccessful()) {
+                    Object lcc = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
-                        strr.add(document.getData().get("shop_name").toString());
+                        lcc = document.getData().get("lcc");
+                        strr.add(document.getData().get("shop_name").toString()+": "+lcc);
                         //+ ": "+document.getData().get("lcc").toString() -- show null
                     }
                     updatelist(strr);
@@ -452,9 +440,11 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 ArrayList<String> strr = new ArrayList<>();
                 if (task.isSuccessful()) {
+                    Object lcc = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
-                        strr.add(document.getData().get("shop_name").toString() );
+                        lcc = document.getData().get("lcc");
+                        strr.add(document.getData().get("shop_name").toString()+": "+lcc);
                         //+ ": "+document.getData().get("lcc").toString() -- show null
                     }
                     updatelist(strr);
@@ -624,33 +614,6 @@ class RequestJsonPlaces extends AsyncTask<String, String, String> {
 
 }
 
-
-class NoteRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    private ArrayList<String> mNotes = new ArrayList<>();
-    private Context mContext;
-
-    public NoteRecyclerViewAdapter(Context context, ArrayList<String> notes) {
-        mNotes = notes;
-        mContext = context;
-    }
-
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return 0;
-    }
-}
 
 class Point {
     double lattitude;
