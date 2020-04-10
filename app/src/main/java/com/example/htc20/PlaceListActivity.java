@@ -88,6 +88,7 @@ public class PlaceListActivity extends AppCompatActivity {
     private static final double MAX_LAT = Math.toRadians(90d);
     private static final double MIN_LON = Math.toRadians(-180d);
     private static final double MAX_LON = Math.toRadians(180d);
+    ArrayList<ArrayList<String>> RegStores = new ArrayList<ArrayList<String>>();
 
 
 
@@ -350,18 +351,13 @@ public class PlaceListActivity extends AppCompatActivity {
                     LatLng[] latLng1 = boundingCoordinates(PROXIMITY_RADIUS);
                     Log.d("mmtag", "val:" + latLng1[0]);
 
-                    final List<String> Str1 = new ArrayList<>();
-                    final List<String> Str2 = new ArrayList<>();
-
-                    Query addquery = addref.whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude).
+                   Query addquery = addref.whereGreaterThanOrEqualTo("latitude", latLng1[0].latitude).
                             whereLessThanOrEqualTo("latitude",latLng1[1].latitude);
 
                    Query addquery1 = addref.whereGreaterThanOrEqualTo("longitude", latLng1[0].longitude).
                             whereLessThanOrEqualTo("longitude",latLng1[1].longitude);
 
-                   queryfunArraylist(addquery, addquery1, "shop_name");
-
-                    Log.d("taggg","val: "+Str1);
+                   queryfunArraylist(addquery, addquery1);
 
                     /*if (Str1.size() != 0 && Str2.size() !=0 ) {
                         Str1.retainAll(Str2);
@@ -408,7 +404,7 @@ public class PlaceListActivity extends AppCompatActivity {
         });
     }
 
-    private void queryfunLcc(Query query, final String PlaceName, final Integer count){
+    synchronized private void queryfunLcc(Query query, final String PlaceName, final Integer count){
 
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -425,7 +421,7 @@ public class PlaceListActivity extends AppCompatActivity {
         });
     }
 
-    private void queryfunArraylist(Query addquery, Query addquery1, String getField) {
+    private void queryfunArraylist(Query addquery, Query addquery1) {
 
         final List str = new ArrayList<String>();
 
@@ -438,6 +434,7 @@ public class PlaceListActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
                         strr.add(document.getData().get("shop_name").toString());
+                        //+ ": "+document.getData().get("lcc").toString() -- show null
                     }
                     updatelist(strr);
                 }
@@ -452,7 +449,8 @@ public class PlaceListActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
-                        strr.add(document.getData().get("shop_name").toString());
+                        strr.add(document.getData().get("shop_name").toString() );
+                        //+ ": "+document.getData().get("lcc").toString() -- show null
                     }
                     updatelist(strr);
                 }
@@ -461,12 +459,19 @@ public class PlaceListActivity extends AppCompatActivity {
         });
 
     }
-    private void updateLCC(Integer lcc, String PlaceName, Integer count){
+    synchronized private void updateLCC(Integer lcc, String PlaceName, Integer count){
         list.add(count + ". " + PlaceName + "\t\t: " + String.valueOf(lcc));
         adapter.notifyDataSetChanged();
 
     }
     private void updatelist(ArrayList<String> element){
+
+        RegStores.add(element);
+        Log.d("taggg","val: "+RegStores);
+        if(RegStores.size() > 1){
+            RegStores.get(0).retainAll(RegStores.get(1));
+            list.add(String.valueOf(RegStores.get(0)));
+        }
 
         //list.add(element);
         //adapter.notifyDataSetChanged();
