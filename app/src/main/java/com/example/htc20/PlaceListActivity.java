@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class PlaceListActivity extends AppCompatActivity {
@@ -74,8 +75,8 @@ public class PlaceListActivity extends AppCompatActivity {
     private EditText searchBar;
 
     // Latitudes and Longitudes of all the essential places
-    double[] Latitudes;
-    double[] Longitudes;
+    HashMap<String, Point> mapCoordinates = new HashMap<>();
+
     //global variables as location will be used outside the local blocks
     double Latitude = 0;
     double Longitude = 0;
@@ -93,7 +94,7 @@ public class PlaceListActivity extends AppCompatActivity {
     private static final double MAX_LON = Math.toRadians(180d);
     ArrayList<ArrayList<String>> RegStores = new ArrayList<ArrayList<String>>();
 
-    HashMap<String, Point> mapCoordinates = new HashMap<>();
+
 
 
 
@@ -254,7 +255,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
                 }else{
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW,
-                            Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Latitudes[index]) + "," + (Longitudes[index])));
+                            Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + (Objects.requireNonNull(mapCoordinates.get(name)).lattitude) + "," + (Objects.requireNonNull(mapCoordinates.get(name)).longitude)));
                     i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
                     startActivity(i);
                 }
@@ -322,8 +323,6 @@ public class PlaceListActivity extends AppCompatActivity {
                     Log.d("listlog", "val:" + list.size());
                     db = FirebaseFirestore.getInstance();
 
-                    Latitudes = new double[placesCount];
-                    Longitudes = new double[placesCount];
 
                     Log.d("Loctag", "value: " + placesCount);
 
@@ -336,12 +335,13 @@ public class PlaceListActivity extends AppCompatActivity {
                             PlaceLong = jsonObject.getJSONObject("geometry").getJSONObject("location").getString("lng");
                             Log.d("Latitudes", "valueLat :" + PlaceLat);
                             Log.d("Longitudes", "valueLong : " + PlaceLong);
-                            Latitudes[i] = Double.parseDouble(PlaceLat);
-                            Longitudes[i] = Double.parseDouble(PlaceLong);
-                            Point p = new Point(Latitudes[i], Longitudes[i]);
-                            mapCoordinates.put(PlaceName, p);
+
+                            Point coordinate = new Point(0, 0);
+                            coordinate.lattitude = Double.parseDouble(PlaceLat);
+                            coordinate.longitude = Double.parseDouble(PlaceLong);
+                            mapCoordinates.put(PlaceName, coordinate);
                             CollectionReference ref = db.collection("store");
-                            Query query = ref.whereEqualTo("latitude", Latitudes[i]).whereEqualTo("longitude", Longitudes[i]);
+                            Query query = ref.whereEqualTo("latitude", coordinate.lattitude).whereEqualTo("longitude", coordinate.longitude);
                             queryfunLcc(query, PlaceName, count);
                             count++;
 
