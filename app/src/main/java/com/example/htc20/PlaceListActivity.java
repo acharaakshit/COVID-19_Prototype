@@ -55,6 +55,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -368,7 +369,7 @@ public class PlaceListActivity extends AppCompatActivity {
 
 
                         //remove duplicates from the list
-                        list = new ArrayList<String>(new LinkedHashSet<String>(list));
+
 
                     }*/
                 }
@@ -473,7 +474,8 @@ public class PlaceListActivity extends AppCompatActivity {
                 list.add((String) iterator.next());
                 adapter.notifyDataSetChanged();
             }
-
+            list = new ArrayList<String>(new LinkedHashSet<String>(list));
+            adapter.notifyDataSetChanged();
         }
 
         //list.add(element);
