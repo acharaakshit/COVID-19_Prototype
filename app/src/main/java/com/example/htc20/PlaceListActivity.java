@@ -367,17 +367,6 @@ public class PlaceListActivity extends AppCompatActivity {
 
                    queryfunArraylist(addquery, addquery1);
 
-                    /*if (Str1.size() != 0 && Str2.size() !=0 ) {
-                        Str1.retainAll(Str2);
-
-                        Log.d("taggg","val: "+Str1);
-
-
-
-                        //remove duplicates from the list
-
-
-                    }*/
                 }
             }
         });
@@ -436,9 +425,11 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 ArrayList<String> strr = new ArrayList<>();
                 if (task.isSuccessful()) {
+                    Object lcc = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
-                        strr.add(document.getData().get("shop_name").toString());
+                        lcc = document.getData().get("lcc");
+                        strr.add(document.getData().get("shop_name").toString()+": "+lcc);
                         //+ ": "+document.getData().get("lcc").toString() -- show null
                     }
                     updatelist(strr);
@@ -452,9 +443,11 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 ArrayList<String> strr = new ArrayList<>();
                 if (task.isSuccessful()) {
+                    Object lcc = 0;
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         //string containing the nearby stores
-                        strr.add(document.getData().get("shop_name").toString() );
+                        lcc = document.getData().get("lcc");
+                        strr.add(document.getData().get("shop_name").toString()+": "+lcc);
                         //+ ": "+document.getData().get("lcc").toString() -- show null
                     }
                     updatelist(strr);
