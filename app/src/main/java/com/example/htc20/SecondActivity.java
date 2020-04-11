@@ -172,7 +172,7 @@ public class SecondActivity extends AppCompatActivity {
 
 
                                                                 lcc++;
-                                                                Toast.makeText(SecondActivity.this, "Entry has been recorded!", Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(SecondActivity.this, "Entry has been recorded!", Toast.LENGTH_SHORT).show();
                                                                 flag = 1;
 
                                                                 db.collection("store").document(id).update("lcc", lcc);
@@ -185,7 +185,8 @@ public class SecondActivity extends AppCompatActivity {
                                             });
                                         } else {
 
-                                            Toast.makeText(SecondActivity.this, "Your entry is already recorded", Toast.LENGTH_LONG).show();
+
+                                            Toast.makeText(SecondActivity.this, "Your entry is already recorded", Toast.LENGTH_SHORT).show();
 
                                         }
                                     }
@@ -215,7 +216,7 @@ public class SecondActivity extends AppCompatActivity {
 
 
                                                                 lcc--;
-                                                                Toast.makeText(SecondActivity.this, "Entry has been recorded!", Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(SecondActivity.this, "Entry has been recorded!", Toast.LENGTH_SHORT).show();
                                                                 flag = 1;
 
                                                                 db.collection("store").document(id).update("lcc", lcc);
@@ -228,7 +229,7 @@ public class SecondActivity extends AppCompatActivity {
                                             });
                                         } else {
 
-                                            Toast.makeText(SecondActivity.this, "Record your entry first", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(SecondActivity.this, "Record your entry first", Toast.LENGTH_SHORT).show();
 
                                         }
                                     }
