@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".StoreDetailsFragment">
+
+    <TextView
+        android:id="@+id/etStoreUniqueID"
+        android:layout_width="match_parent"
+        android:layout_height="164dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display3"
+        android:textColor="#E31919"
+        android:textColorHighlight="#E6D117"
+        android:textStyle="normal|italic"
+        android:visibility="visible" />
+</FrameLayout>

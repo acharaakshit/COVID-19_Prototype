@@ -82,5 +82,8 @@
     <string name="store_owner_dashboard">Store Owner Dashboard</string>
     <string name="exit_qr_code">Exit QR Code</string>
     <string name="entry_qr_code">Entry QR Code</string>
+    <string name="store_details">Store Details</string>
+    <string name="qr_code">QR Code</string>
+    <string name="pending_orders">Pending Orders</string>
 </resources>
 
