@@ -17,10 +17,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -37,10 +43,13 @@ public class CitizenPurchaseActivity extends AppCompatActivity {
     private LinearLayout vertical_layout;
 
     private FirebaseFirestore db;
+    private FirebaseAuth fbauth;
+
 
     private Double latitude;
     private Double longitude;
     private String shop_name;
+    private String customer_details;
     private boolean is_database;
     private String shop_unique_id;
 
@@ -71,6 +80,9 @@ public class CitizenPurchaseActivity extends AppCompatActivity {
         shop.setText(shop_name);
         progress_bar.setVisibility(View.GONE);
 
+        db = FirebaseFirestore.getInstance();
+        getCustomerDetails();
+
         place_order.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,10 +105,11 @@ public class CitizenPurchaseActivity extends AppCompatActivity {
                 }
                 if(result == true && count >=1){
                     progress_bar.setVisibility(View.VISIBLE);
-                    db = FirebaseFirestore.getInstance();
                     final Map<String, String> user = new HashMap<>();
                     user.put("unique_id", shop_unique_id);
                     user.put("shop_name", shop_name);
+                    user.put("customer_details", customer_details);
+                    user.put("order_size", String.valueOf(count));
                     user.put("order_placed", order);
                     db.collection("orders")
                             .add(user)
@@ -134,6 +147,31 @@ public class CitizenPurchaseActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void updateUserInfo(String name, String phone_no){
+        customer_details = name + "#" + phone_no;
+    }
+
+    private void getCustomerDetails(){
+        fbauth = FirebaseAuth.getInstance();
+        FirebaseUser user = fbauth.getCurrentUser();
+        String email = user.getEmail();
+
+        db.collection("citizen")
+                .document(email)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot doc = task.getResult();
+                            String name = doc.getData().get("first_name") + " " + doc.getData().get("last_name");
+                            String phone_no = String.valueOf(doc.getData().get("phone_number"));
+                            updateUserInfo(name, phone_no);
+                        }
+                    }
+        });
     }
     private void addItemsCorrectly(){
         progress_bar.setVisibility(View.GONE);

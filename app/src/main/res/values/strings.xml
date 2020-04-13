@@ -85,5 +85,12 @@
     <string name="store_details">Store Details</string>
     <string name="qr_code">QR Code</string>
     <string name="pending_orders">Pending Orders</string>
+    <string name="refresh_orders">Refresh Orders</string>
+    <string name="current_orders">Current Orders</string>
+
+    <string-array name="order_by">
+        <item>Order Size</item>
+        <item>Order Location</item>
+    </string-array>
 </resources>
 

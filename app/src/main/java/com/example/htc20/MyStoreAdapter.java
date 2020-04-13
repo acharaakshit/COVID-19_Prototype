@@ -17,12 +17,16 @@ public class MyStoreAdapter extends FragmentPagerAdapter {
     private Context myContext;
     int totalTabs;
     private String unique_id;
+    private String location;
+    private String name;
 
-    public MyStoreAdapter(Context context, FragmentManager fm, int totalTabs, String unique_id) {
+    public MyStoreAdapter(Context context, FragmentManager fm, int totalTabs, String unique_id, String name, String location) {
         super(fm);
         myContext = context;
         this.totalTabs = totalTabs;
         this.unique_id = unique_id;
+        this.name = name;
+        this.location = location;
     }
 
     // this is for fragment tabs
@@ -33,7 +37,7 @@ public class MyStoreAdapter extends FragmentPagerAdapter {
                 QRCodeFragment qr_fragment = new QRCodeFragment().newInstance(unique_id);
                 return qr_fragment;
             case 1:
-                StoreDetailsFragment store_details_fragment = new StoreDetailsFragment().newInstance(unique_id);
+                StoreDetailsFragment store_details_fragment = new StoreDetailsFragment().newInstance(unique_id, location, name);
                 return store_details_fragment;
             case 2:
                 PendingOrdersFragment pending_fragment = new PendingOrdersFragment().newInstance("hellow1", "bellow");
