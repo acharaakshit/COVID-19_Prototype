@@ -197,34 +197,37 @@ public class PlaceListActivity extends AppCompatActivity {
                     Button two = (Button) dialog.getWindow().findViewById(R.id.btn_2);
                     TextView text_view = (TextView) dialog.getWindow().findViewById(R.id.etTextDialog);
 
-                        one.setText("order");
-                        two.setText("directions");
-                        one.setOnClickListener(new View.OnClickListener() {
-                            @SuppressLint("WrongConstant")
-                            @Override
-                            public void onClick(View v) {
-                                if(nearbyList.get(position).in_database == true) {
-                                    Intent i = new Intent(PlaceListActivity.this, CitizenPurchaseActivity.class);
-                                    i.putExtra("store_info", nearbyList.get(position).toString());
-                                    startActivity(i);
-                                    dialog.cancel();
-                                }
-                                else{
-                                    serviceUnavailableNotification();
-                                    dialog.cancel();
-                                }
-                            }
-                        });
-
-                        two.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Intent i = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + nearbyList.get(position).getLatitude() + "," + nearbyList.get(position).getLongitude()));
-                                i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                    one.setText("order");
+                    two.setText("directions");
+                    one.setOnClickListener(new View.OnClickListener() {
+                        @SuppressLint("WrongConstant")
+                        @Override
+                        public void onClick(View v) {
+                            if(nearbyList.get(position).in_database == true) {
+                                Intent i = new Intent(PlaceListActivity.this, CitizenPurchaseActivity.class);
+                                i.putExtra("store_info", nearbyList.get(position).toString());
                                 startActivity(i);
                                 dialog.cancel();
                             }
-                        });
+                            else{
+                                serviceUnavailableNotification();
+                                dialog.cancel();
+                            }
+
+                        }
+                    });
+
+                    two.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + nearbyList.get(position).getLatitude() + "," + nearbyList.get(position).getLongitude()));
+                            i.setClassName("com.google.android.apps.maps", "com.google.android.maps.MapsActivity");
+                            startActivity(i);
+                            dialog.cancel();
+                        }
+                    });
+                    dialog.show();
+
                     } else{
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW,
                             Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + nearbyList.get(position).getLatitude() + "," + nearbyList.get(position).getLongitude()));
@@ -263,8 +266,8 @@ public class PlaceListActivity extends AppCompatActivity {
                     int placesCount = 0;
                     switch (store_type) {
                         case 1:     location_type = "pharmacy|drugstore";    break;
-                        case 2:     location_type = "grocery_or_supermarket";     break;
-                        case 3:     location_type = "atm";   break;
+                        case 2:     location_type = "grocery_or_supermarket|store";     break;
+                        case 3:     location_type = "bank|atm";   break;
                         case 4:     location_type = "hospital";   break;
                         default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                     }
@@ -314,10 +317,10 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Uri gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude);
                 switch (store_type) {
-                    case 1:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=pharmacy|drugstore"); break;
-                    case 2:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=grocery_or_supermarket|store");  break;
-                    case 3:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=atm");  break;
-                    case 4:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospital");
+                    case 1:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=pharmacies near me"); break;
+                    case 2:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=groceries near me");  break;
+                    case 3:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=atms and banks near me");  break;
+                    case 4:     gmmIntentUri = Uri.parse("geo:" + Latitude + "," + Longitude + "?q=hospitals near me");
                     default:    Log.d("errtag", "Unexpected entry! check DashboardCitizenActivity");
                 }
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -345,9 +348,13 @@ public class PlaceListActivity extends AppCompatActivity {
                         Log.d("mt", service_category);
                         Integer service_category_no = 0;
                         switch(service_category){
-                            case "Pharmacy": service_category_no = 1; break;
-                            case "Grocery Shop" : service_category_no = 2;   break;
-                            case "Bank"   : service_category_no = 3;    break;
+                            case "Medical Store": service_category_no = 1; break;
+                            case "Grocery Shop" :
+                            case "Supermarket"  :
+                                service_category_no = 2;   break;
+                            case "Bank"   :
+                            case "ATM"    :
+                                service_category_no = 3;    break;
                             case "Hospital" : service_category_no = 4; break;
                             default:
                         }
@@ -358,6 +365,8 @@ public class PlaceListActivity extends AppCompatActivity {
                             String unique_id = document.getId();
                             String lcc = document.getData().get("lcc").toString();
                             strr.add(document.getData().get("shop_name").toString() + ": " + lcc + "@" + lati + "@" + longi + "@" + unique_id);
+                            Log.d("sttr[last] = ", strr.get(strr.size() - 1));
+
                         }else{
                             Log.d("mytag","The service category is not registered");
                             shop_check=2;
@@ -367,6 +376,10 @@ public class PlaceListActivity extends AppCompatActivity {
                     updatelist(strr);
                     else if (shop_check == 2)
                         setListView();
+                    Log.d("shop_check = ", String.valueOf(shop_check));
+                    Log.d("strr.size() = ", String.valueOf(strr.size()));
+                    Log.d("sttr[last] = ", strr.get(strr.size() - 1));
+
                 }
                 else{
                     //if the document is empty add the unregistered stores to listview
@@ -393,18 +406,14 @@ public class PlaceListActivity extends AppCompatActivity {
                         String service_category = (String) document.get("service_category");
                         Integer service_category_no = 0;
                         switch (service_category) {
-                            case "Pharmacy":
-                                service_category_no = 1;
-                                break;
-                            case "Grocery Shop":
-                                service_category_no = 2;
-                                break;
-                            case "Bank":
-                                service_category_no = 3;
-                                break;
-                            case "Hospital":
-                                service_category_no = 4;
-                                break;
+                            case "Medical Store": service_category_no = 1; break;
+                            case "Grocery Shop" :
+                            case "Supermarket"  :
+                                service_category_no = 2;   break;
+                            case "Bank"   :
+                            case "ATM"    :
+                                service_category_no = 3;    break;
+                            case "Hospital" : service_category_no = 4; break;
                             default:
                         }
                         if (service_category_no == store_type) {
@@ -423,6 +432,9 @@ public class PlaceListActivity extends AppCompatActivity {
                         updatelist(strr);
                     else if (shop_check == 2)
                         setListView();
+                    Log.d("shop_check = ", String.valueOf(shop_check));
+                    Log.d("strr.size() = ", String.valueOf(strr.size()));
+                    Log.d("sttr[last] = ", strr.get(strr.size() - 1));
                 } else {
                     //if the document is empty add the unregistered stores to listview
                     setListView();
@@ -483,8 +495,16 @@ public class PlaceListActivity extends AppCompatActivity {
 
     private void setListView(){
         for(NearbyPlaces np: nearbyList) {
-            String answer = np.getPlaceName() + "\t|\t LCC: \t" + String.valueOf(np.getLCC());
-            list.add(answer);
+            if(np.getLCC() == null){
+                //if store is unregistered
+                String answer = np.getPlaceName() + "\t|\t LCC: \t"+"N/R";
+                list.add(answer);
+            }
+            else {
+                String answer = np.getPlaceName() + "\t|\t LCC: \t" + String.valueOf(np.getLCC());
+                list.add(answer);
+            }
+
         }
         if(is_registered_locality == false){
             Toast.makeText(getApplicationContext(), "There are no registered stores in this area:(", Toast.LENGTH_SHORT).show();

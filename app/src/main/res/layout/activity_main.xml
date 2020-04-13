@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B3EA7F7F"
+    android:background="#B31E3B71"
     android:visibility="visible"
     tools:context=".MainActivity">
 
@@ -14,12 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="224dp"
         android:background="#C3FFFFFF"
-        android:text="@string/log_in"
+        android:text="LOGIN"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPassword"
+        app:layout_constraintTop_toBottomOf="@+id/etPassLayout"
         app:layout_constraintVertical_bias="1.0" />
 
     <EditText
@@ -58,18 +58,6 @@
         app:layout_constraintTop_toBottomOf="@+id/btnLogin"
         app:layout_constraintVertical_bias="0.825" />
 
-    <Button
-        android:id="@+id/btnLoginPhone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:background="#C3FFFFFF"
-        android:text="@string/login_in_with_phone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etPassLayout"
         android:layout_width="214dp"
@@ -81,6 +69,24 @@
         app:layout_constraintTop_toBottomOf="@+id/etEmail"
         app:layout_constraintVertical_bias="0.09"
         app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="202dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="32dp"
+            android:background="#98FFFFFF"
+            android:ems="10"
+            android:fontFamily="serif-monospace"
+            android:hint="@string/enter_password"
+            android:inputType="textPassword"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.511"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etEmail"
+            app:layout_constraintVertical_bias="0.0" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -99,33 +105,15 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="163dp"
-        android:layout_height="140dp"
+        android:layout_width="175dp"
+        android:layout_height="154dp"
         android:contentDescription="TODO"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.165"
-        app:srcCompat="@drawable/doctorwebicon" />
+        app:layout_constraintVertical_bias="0.116"
+        app:srcCompat="@drawable/user" />
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/etPassword"
-        android:layout_width="202dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="32dp"
-        android:background="#98FFFFFF"
-        android:ems="10"
-        android:fontFamily="serif-monospace"
-        android:hint="@string/enter_password"
-        android:inputType="textPassword"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.511"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etEmail"
-        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

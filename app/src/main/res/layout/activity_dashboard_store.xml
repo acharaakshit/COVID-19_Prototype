@@ -10,7 +10,7 @@
         android:id="@+id/linearLayout"
         android:layout_width="416dp"
         android:layout_height="218dp"
-        android:background="@drawable/wallpaper"
+        android:background="@color/BurlyWood"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/etViewPager"
