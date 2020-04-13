@@ -225,6 +225,7 @@ public class PlaceListActivity extends AppCompatActivity {
                                 dialog.cancel();
                             }
                         });
+                        dialog.show();
                     } else{
                     Intent i = new Intent(android.content.Intent.ACTION_VIEW,
                             Uri.parse("http://maps.google.com/maps?saddr=" + Latitude + "," + Longitude + "&daddr=" + nearbyList.get(position).getLatitude() + "," + nearbyList.get(position).getLongitude()));
