@@ -40,7 +40,7 @@ public class MyStoreAdapter extends FragmentPagerAdapter {
                 StoreDetailsFragment store_details_fragment = new StoreDetailsFragment().newInstance(unique_id, location, name);
                 return store_details_fragment;
             case 2:
-                PendingOrdersFragment pending_fragment = new PendingOrdersFragment().newInstance("hellow1", "bellow");
+                PendingOrdersFragment pending_fragment = new PendingOrdersFragment().newInstance(unique_id, "bellow");
                 return pending_fragment;
             default:
                 return null;

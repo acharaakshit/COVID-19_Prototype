@@ -100,7 +100,7 @@ public class CitizenPurchaseActivity extends AppCompatActivity {
                     }
                     else if(!item_name.getText().toString().isEmpty() && !item_quantity.getText().toString().isEmpty()){
                         count++;
-                        order += count + ". " + item_name.getText().toString().trim() + " X " + item_quantity.getText().toString().trim() + "|\n";
+                        order += item_name.getText().toString().trim() + "X" + item_quantity.getText().toString().trim() + "@";
                     }
                 }
                 if(result == true && count >=1){

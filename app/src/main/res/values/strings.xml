@@ -87,6 +87,8 @@
     <string name="pending_orders">Pending Orders</string>
     <string name="refresh_orders">Refresh Orders</string>
     <string name="current_orders">Current Orders</string>
+    <string name="back">Back</string>
+    <string name="accept_order">Accept Order</string>
 
     <string-array name="order_by">
         <item>Order Size</item>
