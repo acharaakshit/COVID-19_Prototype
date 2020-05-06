@@ -45,7 +45,7 @@ For developer instructions see [Developer Wiki](../../wiki)
 We want to keep this app as open source and wish to contribute to the community.
 
 
-
+Please feel free to contribute!
 
 
 
