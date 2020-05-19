@@ -339,54 +339,54 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
             ArrayList<String> strr = new ArrayList<>();
             int shop_check =0;
-            if (task.isSuccessful()) {
-                //check if list is empty
-                if (task.getResult().getDocuments().size() > 0) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                if (task.isSuccessful()) {
+                    //check if list is empty
+                    if (task.getResult().getDocuments().size() > 0) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
 
-                        String service_category = (String) document.get("service_category");
-                        Log.d("mt", service_category);
-                        Integer service_category_no = 0;
-                        switch(service_category){
-                            case "Medical Store": service_category_no = 1; break;
-                            case "Grocery Shop" :
-                            case "Supermarket"  :
-                                service_category_no = 2;   break;
-                            case "Bank"   :
-                            case "ATM"    :
-                                service_category_no = 3;    break;
-                            case "Hospital" : service_category_no = 4; break;
-                            default:
-                        }
-                        if(service_category_no == store_type) {
-                            shop_check =1;
-                            String lati = document.getData().get("latitude").toString();
-                            String longi = document.getData().get("longitude").toString();
-                            String unique_id = document.getId();
-                            String lcc = document.getData().get("lcc").toString();
-                            strr.add(document.getData().get("shop_name").toString() + ": " + lcc + "@" + lati + "@" + longi + "@" + unique_id);
-                            Log.d("sttr[last] = ", strr.get(strr.size() - 1));
+                            String service_category = (String) document.get("service_category");
+                            Log.d("mt", service_category);
+                            Integer service_category_no = 0;
+                            switch(service_category){
+                                case "Medical Store": service_category_no = 1; break;
+                                case "Grocery Shop" :
+                                case "Supermarket"  :
+                                    service_category_no = 2;   break;
+                                case "Bank"   :
+                                case "ATM"    :
+                                    service_category_no = 3;    break;
+                                case "Hospital" : service_category_no = 4; break;
+                                default:
+                            }
+                            if(service_category_no == store_type) {
+                                shop_check =1;
+                                String lati = document.getData().get("latitude").toString();
+                                String longi = document.getData().get("longitude").toString();
+                                String unique_id = document.getId();
+                                String lcc = document.getData().get("lcc").toString();
+                                strr.add(document.getData().get("shop_name").toString() + ": " + lcc + "@" + lati + "@" + longi + "@" + unique_id);
+                                Log.d("sttr[last] = ", strr.get(strr.size() - 1));
 
-                        }else{
-                            Log.d("mytag","The service category is not registered");
-                            shop_check=2;
+                            }else{
+                                Log.d("mytag","The service category is not registered");
+                                shop_check=2;
+                            }
                         }
+                        if (shop_check == 1)
+                        updatelist(strr);
+                        else if (shop_check == 2)
+                            setListView();
+                        Log.d("shop_check = ", String.valueOf(shop_check));
+                        Log.d("strr.size() = ", String.valueOf(strr.size()));
+                        Log.d("sttr[last] = ", strr.get(strr.size() - 1));
+
                     }
-                    if (shop_check == 1)
-                    updatelist(strr);
-                    else if (shop_check == 2)
+                    else{
+                        //if the document is empty add the unregistered stores to listview
                         setListView();
-                    Log.d("shop_check = ", String.valueOf(shop_check));
-                    Log.d("strr.size() = ", String.valueOf(strr.size()));
-                    Log.d("sttr[last] = ", strr.get(strr.size() - 1));
-
+                        Toast.makeText(getApplicationContext(), "There are no registered stores in the database:(", 1000).show();
+                    }
                 }
-                else{
-                    //if the document is empty add the unregistered stores to listview
-                    setListView();
-                    Toast.makeText(getApplicationContext(), "There are no registered stores in the database:(", 1000).show();
-                }
-            }
             }
         });
 
@@ -398,49 +398,49 @@ public class PlaceListActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
             int shop_check = 0;
             ArrayList<String> strr = new ArrayList<>();
-            if (task.isSuccessful()) {
-                //check if list is empty
-                if (task.getResult().getDocuments().size() > 0) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        //string containing the nearby stores
-                        String service_category = (String) document.get("service_category");
-                        Integer service_category_no = 0;
-                        switch (service_category) {
-                            case "Medical Store": service_category_no = 1; break;
-                            case "Grocery Shop" :
-                            case "Supermarket"  :
-                                service_category_no = 2;   break;
-                            case "Bank"   :
-                            case "ATM"    :
-                                service_category_no = 3;    break;
-                            case "Hospital" : service_category_no = 4; break;
-                            default:
+                if (task.isSuccessful()) {
+                    //check if list is empty
+                    if (task.getResult().getDocuments().size() > 0) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            //string containing the nearby stores
+                            String service_category = (String) document.get("service_category");
+                            Integer service_category_no = 0;
+                            switch (service_category) {
+                                case "Medical Store": service_category_no = 1; break;
+                                case "Grocery Shop" :
+                                case "Supermarket"  :
+                                    service_category_no = 2;   break;
+                                case "Bank"   :
+                                case "ATM"    :
+                                    service_category_no = 3;    break;
+                                case "Hospital" : service_category_no = 4; break;
+                                default:
+                            }
+                            if (service_category_no == store_type) {
+                                shop_check = 1;
+                                String lati = document.getData().get("latitude").toString();
+                                String longi = document.getData().get("longitude").toString();
+                                String unique_id = document.getId();
+                                String lcc = document.getData().get("lcc").toString();
+                                strr.add(document.getData().get("shop_name").toString() + ": " + lcc + "@" + lati + "@" + longi + "@" + unique_id);
+                            }else{
+                                Log.d("mytag","The service category is not registered");
+                                shop_check=2;
+                            }
                         }
-                        if (service_category_no == store_type) {
-                            shop_check = 1;
-                            String lati = document.getData().get("latitude").toString();
-                            String longi = document.getData().get("longitude").toString();
-                            String unique_id = document.getId();
-                            String lcc = document.getData().get("lcc").toString();
-                            strr.add(document.getData().get("shop_name").toString() + ": " + lcc + "@" + lati + "@" + longi + "@" + unique_id);
-                        }else{
-                            Log.d("mytag","The service category is not registered");
-                            shop_check=2;
-                        }
-                    }
-                    if (shop_check == 1)
-                        updatelist(strr);
-                    else if (shop_check == 2)
+                        if (shop_check == 1)
+                            updatelist(strr);
+                        else if (shop_check == 2)
+                            setListView();
+                        Log.d("shop_check = ", String.valueOf(shop_check));
+                        Log.d("strr.size() = ", String.valueOf(strr.size()));
+                        Log.d("sttr[last] = ", strr.get(strr.size() - 1));
+                    } else {
+                        //if the document is empty add the unregistered stores to listview
                         setListView();
-                    Log.d("shop_check = ", String.valueOf(shop_check));
-                    Log.d("strr.size() = ", String.valueOf(strr.size()));
-                    Log.d("sttr[last] = ", strr.get(strr.size() - 1));
-                } else {
-                    //if the document is empty add the unregistered stores to listview
-                    setListView();
-                    Toast.makeText(getApplicationContext(), "There are no registered stores in the database:(", 1000).show();
+                        Toast.makeText(getApplicationContext(), "There are no registered stores in the database:(", 1000).show();
+                    }
                 }
-            }
             }
         });
     }
